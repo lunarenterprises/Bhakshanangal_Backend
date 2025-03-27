@@ -58,7 +58,7 @@ module.exports.ListProduct = async (req, res) => {
       // imagesInproduct.forEach(el => {
       //   el.image_file = 'bhakshanangal/' + el.image_file
       // });
-      element.image_file = 'bhakshanangal/' + imagesInproduct[0]?.image_file
+      element.image_file = imagesInproduct[0]?.image_file
       element.product_rating = Number(element.product_rating).toFixed(1)
 
       if (wishlistcheck.length > 0) {

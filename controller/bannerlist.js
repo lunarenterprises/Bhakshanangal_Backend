@@ -15,7 +15,7 @@ module.exports.BannerList = async (req, res) => {
             } else {
                 carousel.push(element)
             }
-            element.banner_image = `bhakshanangal/` + element.banner_image
+            element.banner_image =  element.banner_image
         });
         if (getBanner.length > 0) {
             return res.send({

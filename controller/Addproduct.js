@@ -159,7 +159,7 @@ module.exports.AddProducts = async (req, res) => {
                 var oldPath = files[element]["filepath"];
                 var newPath =
                   process.cwd() +
-                  "/bhakshanangal/uploads/product/" +
+                  "/uploads/product/" +
                   files[element]["originalFilename"];
 
                 let rawData = fs.readFileSync(oldPath);

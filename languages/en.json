@@ -84,5 +84,7 @@
     "Coupon_code_not_valid":"Coupon code not valid",
     "coupon_not_found":"coupon not found",
     "coupon_removed_successfully":"coupon removed successfully",
-    "item_already_removed":"item already removed"
+    "item_already_removed":"item already removed",
+    "order_deleted_successfully":"Order deleted successfully",
+    "order_delete_failed":"Failed to delete order"
 }

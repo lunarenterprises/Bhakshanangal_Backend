@@ -52,7 +52,6 @@ route.post("/createorder", CreateOrder);
 var { AddAddresses } = require("./controller/AddAddress");
 route.post("/addaddress", ApikeyVerify, AddAddresses);
 
-
 var { CategoryList } = require('./controller/categorylist')
 route.post('/categorylist', CategoryList)
 
@@ -72,7 +71,6 @@ route.post("/edit-profile", ApikeyVerify, EditProfile);
 
 var { ValidateCoupon } = require('./controller/validateCoupon')
 route.post('/validate-coupon', ApikeyVerify, ValidateCoupon)
-
 
 var { OfferAdd } = require("./controller/offerAdd");
 route.post("/offer-add", OfferAdd);
@@ -152,7 +150,6 @@ route.post("/latest-product", LatestProduct)
 var { RatingList } = require('./controller/ratinglist')
 route.post("/rating/list", RatingList)
 
-
 var { RemoveCategory } = require('./controller/RemoveCategory');
 route.post("/remove-category", RemoveCategory)
 
@@ -161,7 +158,6 @@ route.post("/cancel-order", ApikeyVerify, CancelOrder)
 
 var { RazorpayCallback } = require('./controller/razorpaycallback')
 route.get("/razorpay/callback", RazorpayCallback)
-
 
 var { CancelList } = require('./controller/cancellist');
 route.post("/cancel/list", ApikeyVerify, CancelList)
@@ -207,5 +203,17 @@ route.post("/remove-coupon", RemoveCoupon)
 
 var { RemoveRating } = require("./controller/removerating");
 route.post("/remove-rating", RemoveRating)
+
+var { DeleteOrder } = require('./controller/DeleteOrder')
+route.post('/delete-order', DeleteOrder)
+
+var { UpdateDeliveryDate } = require('./controller/UpdateDeliveryStatus')
+route.post('/update/delivery-status', UpdateDeliveryDate)
+
+var { UpdatePaymentStatus } = require('./controller/UpdatePaymentStatus')
+route.post('/update/order-status', UpdatePaymentStatus)
+
+var { DeleteCategory } = require('./controller/DeleteCategory')
+route.post('/delete-category', DeleteCategory)
 
 module.exports = route;

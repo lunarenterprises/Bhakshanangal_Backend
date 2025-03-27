@@ -3,6 +3,7 @@ var cors = require("cors");
 var app = express();
 var bodyparser = require("body-parser");
 var https = require("https")
+var http = require('http')
 const fs = require('fs');
 const dotenv = require('dotenv')
 dotenv.config()
@@ -20,7 +21,7 @@ dotenv.config()
 // var options = { key: privateKey, cert: certificate, ca: ca };
 
 // var server = https.createServer(options, app);
-var server = https.createServer(app);
+var server = http.createServer(app);
 var io = require("socket.io")(server, {
   maxHttpBufferSize: 10e7,
   cors: {
