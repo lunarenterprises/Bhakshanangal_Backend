@@ -8,19 +8,11 @@ module.exports.ListUser = async (req, res) => {
         var search = req.body.search
         var language = await languages(lang);
         var user_id = req.headers.user_id;
-        var page_no = req.body.page_no ? Number(req.body.page_no) : 1
-        var limit = req.body.limit ? req.body.limit : 10
-        var starting_offset = (limit * page_no) - limit;
-        // console.log(starting_offset, "starting_offset");
-        var ending_offset = limit * page_no
-        //  let Checkadmin = await model.CheckAdminQuery(user_id);
-        // if (Checkadmin.length > 0) {
         let condition = ``
         if (search) {
             condition = `and (lower(user_name) like '${search.toLowerCase()}%' or lower(user_email) like '${search.toLowerCase()}%' or user_mobile like '${search}%')`
         }
-        console.log(page_no, limit, starting_offset, "page_no");
-        let userList = await model.Userlist(condition, limit, starting_offset)
+        let userList = await model.Userlist(condition)
         let totalData = await model.Userlist1(condition)
         console.log(userList.length);
         if (userList.length > 0) {

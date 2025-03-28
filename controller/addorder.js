@@ -31,7 +31,6 @@ module.exports.AddOrder = async (req, res) => {
         date,
         gift_card, payment_method, delivery_date, address_id
       );
-      console.log(AddOrder, "AddOrder");
       if (AddOrder.insertId) {
         product_details.forEach(async (element) => {
           var insertproduct = await model.ProductInsert(AddOrder.insertId, element)

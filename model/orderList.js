@@ -40,20 +40,10 @@ module.exports.productList = async (language, product) => {
 // };
 
 module.exports.Getorder = async(condition)=>{
-    var Query = `select order_amount,user_name,order_product_order_id as order_id,order_product_product_id as product_id ,order_product_quantity as order_quantity,order_product_unit as order_unit,created_at,modified_at,order_status,order_payment_method,gift_card,delivery_mode_status,address_id from  bh_order_product
+    var Query = `select order_amount,user_name,order_product_order_id as order_id,order_product_product_id as product_id ,order_product_quantity as order_quantity,order_product_unit as order_unit,created_at,modified_at,order_status,order_payment_method,gift_card,delivery_status,delivery_date,address_id from  bh_order_product
     left join bh_order_details bo on  order_product_order_id  = order_id
     inner join bh_user u on bo.user_id = u.user_id
-    left join bh_delivery_mode on  delivery_status = delivery_mode_id  where (bo.order_status ='pending' or bo.order_status ='confirmed') ${condition} order by order_id desc `
-    console.log(Query);
-    var data = await query(Query)
-    return data
-}
-
-module.exports.Getorderpaginated = async(condition,page, limit)=>{
-    var Query = `select order_amount,user_name,order_product_order_id as order_id,order_product_product_id as product_id ,order_product_quantity as order_quantity,order_product_unit as order_unit,created_at,modified_at,order_status,order_payment_method,gift_card,delivery_mode_status,address_id from  bh_order_product
-    left join bh_order_details bo on  order_product_order_id  = order_id
-    inner join bh_user u on bo.user_id = u.user_id
-    left join bh_delivery_mode on  delivery_status = delivery_mode_id  where (bo.order_status ='pending' or bo.order_status ='confirmed') ${condition} order by order_id desc limit ${limit} offset ${page}`
+    left join bh_delivery_mode on  delivery_status = delivery_mode_id  ${condition} order by order_id desc `
     var data = await query(Query)
     return data
 }

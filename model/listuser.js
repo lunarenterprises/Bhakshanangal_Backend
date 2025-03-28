@@ -8,9 +8,9 @@ module.exports.CheckAdminQuery = async (user_id) => {
     return data;
 };
 
-module.exports.Userlist = async (condition, limit, page_no) => {
-    var Query = `select * from bh_user where user_role !='admin' and user_status = 'active' ${condition} order by user_id asc limit ? offset ?`;
-    var data = query(Query, [limit, page_no]);
+module.exports.Userlist = async (condition) => {
+    var Query = `select * from bh_user where user_role !='admin' and user_status = 'active' ${condition} order by user_id`;
+    var data = query(Query);
     console.log(Query, "query");
     return data;
 };

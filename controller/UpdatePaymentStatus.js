@@ -21,7 +21,7 @@ module.exports.UpdatePaymentStatus = async (req, res) => {
         }
         let checkuser = await model.CheckUser(user_id);
         if (checkuser.length > 0) {
-            let updated = await model.UpdateOrderStatus(order_id, order_status)
+            let updated = await model.UpdateOrderstatus(order_id, order_status)
             if (updated.affectedRows > 0) {
                 return res.send({
                     result: true,

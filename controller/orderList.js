@@ -8,11 +8,6 @@ module.exports.orderList = async (req, res) => {
         var user_id = req.headers.user_id;
         var search = req.body.search;
 
-        var page_no = req.body.page_no ? Number(req.body.page_no) - 1 : 0
-        var limit = req.body.limit ? req.body.limit : 15
-        // var starting_offset = (limit * page_no) - limit;
-        // console.log(starting_offset, "starting_offset");
-        var ending_offset = limit * page_no
         let selectUser = await model.UserSelect(user_id)
         let UserAll = await model.GetUserAll()
         if (selectUser.length > 0) {
@@ -27,8 +22,8 @@ module.exports.orderList = async (req, res) => {
                 condition = ` and bo.user_id = '${user_id}'`
             }
 
-            let total_count = await model.Getorder(condition)
-            let getOrder = await model.Getorderpaginated(condition, page_no, limit)
+            let getOrder = await model.Getorder(condition)
+            console.log(getOrder)
             let datas = await Promise.all(getOrder.map(async (element) => {
                 i += element.order_amount
                 let address = await model.getAddress(element.address_id)
@@ -48,7 +43,7 @@ module.exports.orderList = async (req, res) => {
                     user_count: UserAll.length,
                     data: datas,
                     current_count: getOrder.length,
-                    total_count: total_count.length,
+                    total_count: getOrder.length,
                     sales: i
                 });
             } else {

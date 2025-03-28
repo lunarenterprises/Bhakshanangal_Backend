@@ -19,16 +19,23 @@ module.exports.DeleteCategory = async (req, res) => {
                 message: "user id is required"
             })
         }
-        let checkUser = await model.CheckUser(user_id);
-        if(checkUser.affectedRows>0){
+        let checkUser = await model.CheckUser(user_id)
+        if (checkUser.lenth == 0) {
             return res.send({
-                result:true,
-                message:"Category deleted successfully"
+                result: false,
+                message: "User not found"
             })
-        }else{
+        }
+        let deletedCategory = await model.DeleteCategory(category_id);
+        if (deletedCategory.affectedRows > 0) {
             return res.send({
-                result:false,
-                message:"Failed to delete category"
+                result: true,
+                message: "Category deleted successfully"
+            })
+        } else {
+            return res.send({
+                result: false,
+                message: "Failed to delete category"
             })
         }
     } catch (error) {

@@ -1,11 +1,24 @@
+const { error } = require("console");
 var db = require("../db/db");
 var util = require("util");
 const query = util.promisify(db.query).bind(db);
 
 module.exports.DeleteCategory = async (category_id) => {
-    var Query = `Delete from bh_product_categories where category_id = ?`;
-    var data = query(Query, [category_id]);
-    return data;
+    try {
+        let productQuery = `DELETE FROM bh_products WHERE category_id = ? AND product_status = 'removed'`;
+        let productData = await query(productQuery, [category_id]);
+
+        if (productData.affectedRows > 0) {
+            let categoryQuery = `DELETE FROM bh_product_categories WHERE category_id = ?`;
+            let categoryData = await query(categoryQuery, [category_id]);
+            return categoryData;
+        } else {
+            throw new Error("No products with status 'removed' found in this category.");
+        }
+    } catch (error) {
+        console.error("Error deleting category:", error);
+        throw error;
+    }
 };
 
 module.exports.CheckUser = async (user_id) => {
