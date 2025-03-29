@@ -16,7 +16,7 @@ module.exports.CancelOrder = async (req, res) => {
             let checkorder = await model.CheckOrder(order_id, user_id);
             console.log(checkorder)
             if (checkorder.length > 0) {
-                if (checkorder[0].order_payment_method !== 'cod') {
+                if (checkorder[0].order_payment_method !== 'Cash on Delivery') {
                     var paymentId = checkorder[0].payment_id; // Replace PAYMENT_ID with the actual payment ID
                     let key_id = "rzp_test_4JJAaipsPAqRRJ"
                     let key_secret = "Gw6kdV3PCewFzn9kpvWU5zJH"
@@ -36,18 +36,18 @@ module.exports.CancelOrder = async (req, res) => {
                         .then(async response => {
                             let removeorder = await model.RemoveOrder(order_id);
 
-                            console.log('Refund successful:', response.data);
+                            console.log('Refund successful:', response?.data);
                             res.send({
                                 result: true,
-                                message: response.data
+                                message: response?.data
                             })
                         })
                         .catch(error => {
 
-                            console.error(error.response.data.error.description);
+                            console.error(error?.response?.data?.error?.description);
                             res.send({
                                 result: false,
-                                message: error.response ? error.response.data.error.description : error.message
+                                message: error.response ? error.response?.data?.error?.description : error?.message
                             })
 
                         });
@@ -73,7 +73,6 @@ module.exports.CancelOrder = async (req, res) => {
             })
         }
     } catch (error) {
-        console.log(error);
         return res.send({
             result: false,
             message: error.message
