@@ -13,9 +13,6 @@ module.exports.ViewCart = async (req, res) => {
         let CheckUser = await model.CheckUserQuery(user_id);
         if (CheckUser.length > 0) {
             let checkCart = await model.checkInCart(lang, user_id)
-            checkCart.forEach(el => {
-                el.image_file = 'bhakshanangal/' + el.image_file
-            });
             if (checkCart.length > 0) {
                 return res.send({
                     result: true,

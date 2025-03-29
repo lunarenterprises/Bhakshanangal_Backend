@@ -216,4 +216,10 @@ route.post('/update/order-status', UpdatePaymentStatus)
 var { DeleteCategory } = require('./controller/DeleteCategory')
 route.post('/delete-category', DeleteCategory)
 
+var { CreateContactUs } = require('./controller/ContactUs')
+route.post('/contactus', ApikeyVerify, CreateContactUs)
+
+var { ListContactus } = require('./controller/ListContactUs')
+route.get('/list/contactus', ListContactus)
+
 module.exports = route;

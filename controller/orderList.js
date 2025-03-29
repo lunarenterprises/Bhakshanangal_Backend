@@ -16,14 +16,13 @@ module.exports.orderList = async (req, res) => {
             if (selectUser[0].user_role == 'admin') {
                 condition = ``
                 if (search) {
-                    condition = ` and bo.order_status = '${search}'`
+                    condition = ` where bo.order_status = '${search}'`
                 }
             } else if (selectUser[0].user_role == 'user') {
-                condition = ` and bo.user_id = '${user_id}'`
+                condition = ` where bo.user_id = '${user_id}'`
             }
 
             let getOrder = await model.Getorder(condition)
-            console.log(getOrder)
             let datas = await Promise.all(getOrder.map(async (element) => {
                 i += element.order_amount
                 let address = await model.getAddress(element.address_id)

@@ -10,9 +10,11 @@ module.exports.CancelOrder = async (req, res) => {
         var language = await languages(lang);
         var user_id = req.headers.user_id;
         var order_id = req.body.order_id;
+
         let checkuser = await model.CheckUser(user_id);
         if (checkuser.length > 0) {
             let checkorder = await model.CheckOrder(order_id, user_id);
+            console.log(checkorder)
             if (checkorder.length > 0) {
                 if (checkorder[0].order_payment_method !== 'cod') {
                     var paymentId = checkorder[0].payment_id; // Replace PAYMENT_ID with the actual payment ID
@@ -51,10 +53,10 @@ module.exports.CancelOrder = async (req, res) => {
                         });
                 } else {
                     let removeorder = await model.RemoveOrder(order_id);
-                       res.send({
-                                result: true,
-                                message: "order cancelled successfully"
-                            })
+                    res.send({
+                        result: true,
+                        message: "order cancelled successfully"
+                    })
                 }
                 console.log("in here", checkorder[0].order_payment_method);
 

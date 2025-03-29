@@ -8,7 +8,7 @@ module.exports.CheckUser = async(user_id) => {
     return data;
 };
 module.exports.CheckOrder = async(order_id,user_id) => {
-    var Query = `select * from bh_order_details where order_id = ? and order_status = 'confirmed' and user_id = ?`;
+    var Query = `select * from bh_order_details where order_id = ? and order_status <> 'Out for Delivery' and order_status <> "Delivered" and user_id = ?`;
     var data = query(Query,[order_id,user_id]);
     return data;
 };
