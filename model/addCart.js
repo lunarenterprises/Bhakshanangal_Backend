@@ -17,20 +17,25 @@ module.exports.checkProduct = async (product_id, language) => {
 };
 
 
-module.exports.AddingCart= async(product_id,user_id,quantity,unit)=>{
-var Query = `insert into bh_cart(product_id,user_id,quantity,unit,status)values(?,?,?,?,?)`
-var data = await query(Query,[product_id,user_id,quantity,unit,'active']);
-return data
+module.exports.AddingCart = async (product_id, user_id, quantity, unit) => {
+  var Query = `insert into bh_cart(product_id,user_id,quantity,unit,status)values(?,?,?,?,?)`
+  var data = await query(Query, [product_id, user_id, quantity, unit, 'active']);
+  return data
 }
 
-module.exports.checkProductInCart = async(product_id,user_id)=>{
+module.exports.checkProductInCart = async (product_id, user_id) => {
   var Query = `select cart_id from bh_cart where user_id =? and product_id = ?`
-var data = await query(Query,[user_id,product_id]);
-return data;
+  var data = await query(Query, [user_id, product_id]);
+  return data;
 }
 
-module.exports.UpdateProductInCart = async(product_id,user_id,quantity,unit)=>{
+module.exports.UpdateProductInCart = async (product_id, user_id, quantity, unit) => {
   var Query = `update bh_cart set quantity = ?,unit = ?,status = ? where user_id =? and product_id = ?`
-var data = await query(Query,[quantity,unit,'active',user_id,product_id]);
-return data;
+  var data = await query(Query, [quantity, unit, 'active', user_id, product_id]);
+  return data;
+}
+
+module.exports.RemoveFromWishlist = async (user_id, product_id)=>{
+  var Query = `delete from bh_wishlist where wish_user_id=? and wish_product_id=?`
+  return await query(Query, [user_id, product_id])
 }

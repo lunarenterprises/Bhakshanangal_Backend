@@ -21,7 +21,7 @@ module.exports.addCart = async (req, res) => {
         let checkingProductInCart = await model.checkProductInCart(product_id, user_id)
         if (checkingProductInCart.length == 0) {
           let AddingproductIncart = await model.AddingCart(product_id, user_id, quantities, unit)
-
+          let removeFromWishlist = await model.RemoveFromWishlist(user_id, product_id)
         } else {
           await model.UpdateProductInCart(product_id, user_id, quantities, unit)
         }
@@ -35,7 +35,6 @@ module.exports.addCart = async (req, res) => {
       return res.send({ result: false, message: language.user_does_not_exist });
     }
   } catch (error) {
-    console.log(error);
     return res.send({
       result: false,
       message: error.message,

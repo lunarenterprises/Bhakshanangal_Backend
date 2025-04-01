@@ -5,7 +5,13 @@ module.exports.ListWishlist = async (req, res) => {
     try {
         var lang = req.body.lang || "en";
         var language = await languages(lang);
-        var user_id = req.headers.user_id;
+        var { user_id } = req.headers;
+        if (!user_id) {
+            return res.send({
+                result: false,
+                message: "User id is required"
+            })
+        }
         let checkuser = await model.CheckUser(user_id);
         if (checkuser.length > 0) {
             let checkwish = await model.wishcheck(user_id);
@@ -14,10 +20,9 @@ module.exports.ListWishlist = async (req, res) => {
                 let product_id = checkwish.map(el => {
                     return el.wish_product_id
                 })
-                console.log(product_id);
                 let productdata = await model.GetProducts(lang, product_id)
                 productdata.forEach(element => {
-                    element.image_file = 'bhakshanangal/' + element.image_file
+                    element.image_file = element.image_file
                     element.product_rating = Number(element.product_rating).toFixed(1)
                 });
                 return res.send({
@@ -31,8 +36,11 @@ module.exports.ListWishlist = async (req, res) => {
                     message: language.wishlist_empty
                 })
             }
-
-
+        } else {
+            return res.send({
+                result: false,
+                message: "User not found"
+            })
         }
     } catch (error) {
         return res.send({
