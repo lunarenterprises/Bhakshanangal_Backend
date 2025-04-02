@@ -28,12 +28,12 @@ module.exports.ViewProducts = async (req, res) => {
             }
             let imagesInproduct = await model.GetImages(element.product_id)
             imagesInproduct.forEach(el => {
-                el.image_file = 'bhakshanangal/' + el.image_file
+                el.image_file =  el.image_file
             });
             let imagesInMain = await model.GetImagess(element.product_id)
 
             element.product_image = imagesInproduct
-            element.image_file = 'bhakshanangal/' + imagesInMain[0].image_file
+            element.image_file =  imagesInMain[0].image_file
             element.delivery_date = delivery_date
             element.product_rating = Number(element.product_rating).toFixed(1)
             return element

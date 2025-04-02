@@ -10,7 +10,7 @@ module.exports.LatestProduct = async (req, res) => {
         // if (checkuser.length > 0) {
         let listproduct = await model.ListProduct(lang);
         let data = await Promise.all(listproduct.map(async (el) => {
-            el.image_file = 'bhakshanangal/' + el.image_file
+            el.image_file =  el.image_file
             return el
         }))
         if (listproduct.length > 0) {

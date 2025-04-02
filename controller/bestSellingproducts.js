@@ -12,7 +12,7 @@ module.exports.BestSellingProducts = async (req, res) => {
         // if (checkUser.length > 0) {
             let bestSelling = await model.SellingTop(lang);
             bestSelling.forEach(element => {
-                element.image_file = 'bhakshanangal/' + element.image_file
+                element.image_file =  element.image_file
                 element.product_rating = Number(element.product_rating).toFixed(1)
             });
             if (bestSelling.length > 0) {
