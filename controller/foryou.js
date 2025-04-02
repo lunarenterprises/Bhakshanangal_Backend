@@ -30,7 +30,7 @@ module.exports.ForYou = async (req, res) => {
                 // console.log(category_id);
                 let GetProduct = await model.GetProducts(lang, category_id, limit, starting_offset);
                 GetProduct.forEach(element => {
-                    element.image_file = 'bhakshanangal/' + element.image_file
+                    element.image_file = element.image_file
                 });
                 let totalData = await model.GetProducts1(lang, category_id)
 
