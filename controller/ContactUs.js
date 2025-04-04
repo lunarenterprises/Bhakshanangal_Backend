@@ -23,7 +23,7 @@ module.exports.CreateContactUs = async (req, res) => {
         let CheckUser = await model.CheckUserQuery(user_id);
         if (CheckUser.length > 0) {
             let contactData = await model.InsertContactus(user_id, name, email, message)
-            if (contactData.affectedData> 0) {
+            if (contactData.affectedRows > 0) {
                 return res.send({
                     result: true,
                     message: "Created contact us successfully",
