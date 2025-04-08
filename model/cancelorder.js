@@ -20,3 +20,9 @@ module.exports.RemoveOrder = async(order_id) => {
     var data = query(Query,[order_id]);
     return data;
 };
+
+module.exports.Getaddress = async (address_id) => {
+    var Query = `select * from bh_address where address_id = ?`;
+    var data = query(Query, [address_id]);
+    return data;
+}
