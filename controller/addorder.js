@@ -8,8 +8,10 @@ var nodemailer = require("nodemailer");
 
 module.exports.AddOrder = async (req, res) => {
   try {
-    let key_id = process.env.RAZORPAY_ID_KEY
-    let key_secret = process.env.RAZORPAY_SECRET_KEY
+    // let key_id = "rzp_test_7nzrvkrL9tTZ0I"
+    // let key_secret = "ZRvJ0KBWEHoHd7RqSXReRsEd"
+    let key_id = "rzp_live_rTIA0YO4qxlLxK"
+    let key_secret = "3KVCpUQ0A4n636u2bSh8mvkO"
 
     var lang = req.body.lang || 'en';
     var language = await languages(lang);
@@ -64,8 +66,8 @@ module.exports.AddOrder = async (req, res) => {
             auth: {
               type: 'custom',
               method: 'PLAIN',
-              user: 'noreply@kdpdwct.org',
-              pass: 'noreply@Kdpdwct2024',
+              user: 'noreply@bhakshanangal.com',
+              pass: 'noreplay@BH123',
             },
           });
 
@@ -174,7 +176,7 @@ module.exports.AddOrder = async (req, res) => {
 `
           },
           {
-            email: 'jaisonlunar701@gmail.com',
+            email: 'bhakshanangalfoods@gmail.com',
             subject: `BHAKSHANAGAL ORDER FROM : ${CheckUser[0]?.user_name}`,
             html: `<!DOCTYPE html>
 <html lang="en">
@@ -286,7 +288,7 @@ module.exports.AddOrder = async (req, res) => {
 
           data.forEach(async (el) => {
             let infos = await transporter.sendMail({
-              from: "BHAKSHANAGAL <noreply@kdpdwct.org>",
+              from: "BHAKSHANAGAL <noreply@bhakshanangal.com>",
               to: el.email,
               subject: el.subject,
               html: el.html

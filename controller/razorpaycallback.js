@@ -55,8 +55,8 @@ module.exports.RazorpayCallback = async (req, res) => {
         auth: {
             type: 'custom',
             method: 'PLAIN',
-            user: 'noreply@kdpdwct.org',
-            pass: 'noreply@Kdpdwct2024',
+            user: 'noreply@bhakshanangal.com',
+            pass: 'noreplay@BH123',
         },
     });
 
@@ -165,7 +165,7 @@ module.exports.RazorpayCallback = async (req, res) => {
     `
     },
     {
-        email: 'jaisonlunar701@gmail.com',
+        email: 'bhakshanangalfoods@gmail.com',
         subject: `BHAKSHANAGAL ORDER FROM : ${CheckUser[0]?.user_name}`,
         html: `<!DOCTYPE html>
     <html lang="en">
@@ -277,7 +277,7 @@ module.exports.RazorpayCallback = async (req, res) => {
 
     data.forEach(async (el) => {
         let infos = await transporter.sendMail({
-            from: "BHAKSHANAGAL <noreply@kdpdwct.org>",
+            from: "BHAKSHANAGAL <noreply@bhakshanangal.com>",
             to: el.email,
             subject: el.subject,
             html: el.html

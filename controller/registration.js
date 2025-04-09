@@ -14,7 +14,7 @@ module.exports.Regsiter = async (req, res) => {
     if (!name || !email || !password) {
       return res.send({
         result: false,
-        message:language.insufficient_parameters,
+        message: language.insufficient_parameters,
       });
     }
 
@@ -36,8 +36,8 @@ module.exports.Regsiter = async (req, res) => {
         let transporter = nodemailer.createTransport({
           service: "Gmail",
           auth: {
-            user: "umeshudayan14@gmail.com",
-            pass: "ntvowdicdtcnswhf",
+            user: "noreply@bhakshanangal.com",
+            pass: "noreplay@BH123",
           },
         });
         console.log("haiiiii", token);
@@ -147,8 +147,8 @@ module.exports.Regsiter = async (req, res) => {
       let transporter = nodemailer.createTransport({
         service: "Gmail",
         auth: {
-          user: "umeshudayan14@gmail.com",
-          pass: "ntvowdicdtcnswhf",
+          user: "noreply@bhakshanangal.com",
+          pass: "noreplay@BH123",
         },
       });
       let info = await transporter.sendMail({
@@ -241,7 +241,7 @@ module.exports.Regsiter = async (req, res) => {
       console.log(info);
       return res.send({
         status: true,
-        message:language.verification_code_sent_to_ur_mail,
+        message: language.verification_code_sent_to_ur_mail,
       });
     }
   } catch (error) {

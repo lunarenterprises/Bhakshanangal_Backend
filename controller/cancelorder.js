@@ -71,8 +71,8 @@ module.exports.CancelOrder = async (req, res) => {
                         auth: {
                             type: 'custom',
                             method: 'PLAIN',
-                            user: 'noreply@kdpdwct.org',
-                            pass: 'noreply@Kdpdwct2024',
+                            user: 'noreply@bhakshanangal.com',
+                            pass: 'noreplay@BH123',
                         },
                     });
 
@@ -140,7 +140,7 @@ module.exports.CancelOrder = async (req, res) => {
 `
                     },
                     {
-                        email: 'jaisonlunar701@gmail.com',
+                        email: 'bhakshanangalfoods@gmail.com',
                         subject: `BHAKSHANAGAL CANCEL ORDER FROM : ${checkuser[0]?.user_name}`,
                         html: `<!DOCTYPE html>
 <html lang="en">
@@ -225,7 +225,7 @@ module.exports.CancelOrder = async (req, res) => {
 
                     data.forEach(async (el) => {
                         let infos = await transporter.sendMail({
-                            from: "BHAKSHANAGAL <noreply@kdpdwct.org>",
+                            from: "BHAKSHANAGAL <noreply@bhakshanangal.com>",
                             to: el.email,
                             subject: el.subject,
                             html: el.html
