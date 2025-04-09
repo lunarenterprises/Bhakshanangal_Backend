@@ -29,13 +29,14 @@ module.exports.ForgotPassword = async (req, res) => {
         await model.InsertVerificationQuery(CheckUser[0].user_id, token);
       }
       let transporter = nodemailer.createTransport({
-        service: "Gmail",
+        host: "smtp.hostinger.com",
+        port: 587,
         auth: {
           user: "noreply@bhakshanangal.com",
           pass: "noreplay@BH123",
         },
       });
-      console.log("haiiiii", token);
+      // console.log("haiiiii", token);
       let info = await transporter.sendMail({
         from: "contact@bhakshanangal.com",
         to: email,

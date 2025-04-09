@@ -34,7 +34,8 @@ module.exports.Regsiter = async (req, res) => {
           await model.InsertVerificationQuery(CheckUser[0].user_id, token);
         }
         let transporter = nodemailer.createTransport({
-          service: "Gmail",
+          host: "smtp.hostinger.com",
+          port: 587,
           auth: {
             user: "noreply@bhakshanangal.com",
             pass: "noreplay@BH123",
@@ -145,7 +146,8 @@ module.exports.Regsiter = async (req, res) => {
       var InsertUser = await model.InsertUserQuery(name, email, hashedPassword);
       await model.InsertVerificationQuery(InsertUser.insertId, token);
       let transporter = nodemailer.createTransport({
-        service: "Gmail",
+        host: "smtp.hostinger.com",
+        port: 587,
         auth: {
           user: "noreply@bhakshanangal.com",
           pass: "noreplay@BH123",
