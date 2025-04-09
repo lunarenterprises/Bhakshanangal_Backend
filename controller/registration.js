@@ -14,7 +14,7 @@ module.exports.Regsiter = async (req, res) => {
     if (!name || !email || !password) {
       return res.send({
         result: false,
-        message: language.insufficient_parameters,
+        message:language.insufficient_parameters,
       });
     }
 
@@ -34,11 +34,10 @@ module.exports.Regsiter = async (req, res) => {
           await model.InsertVerificationQuery(CheckUser[0].user_id, token);
         }
         let transporter = nodemailer.createTransport({
-          host: "smtp.hostinger.com",
-          port: 587,
+          service: "Gmail",
           auth: {
-            user: "noreply@bhakshanangal.com",
-            pass: "noreplay@BH123",
+            user: "umeshudayan14@gmail.com",
+            pass: "ntvowdicdtcnswhf",
           },
         });
         console.log("haiiiii", token);
@@ -146,11 +145,10 @@ module.exports.Regsiter = async (req, res) => {
       var InsertUser = await model.InsertUserQuery(name, email, hashedPassword);
       await model.InsertVerificationQuery(InsertUser.insertId, token);
       let transporter = nodemailer.createTransport({
-        host: "smtp.hostinger.com",
-        port: 587,
+        service: "Gmail",
         auth: {
-          user: "noreply@bhakshanangal.com",
-          pass: "noreplay@BH123",
+          user: "umeshudayan14@gmail.com",
+          pass: "ntvowdicdtcnswhf",
         },
       });
       let info = await transporter.sendMail({
@@ -243,7 +241,7 @@ module.exports.Regsiter = async (req, res) => {
       console.log(info);
       return res.send({
         status: true,
-        message: language.verification_code_sent_to_ur_mail,
+        message:language.verification_code_sent_to_ur_mail,
       });
     }
   } catch (error) {
