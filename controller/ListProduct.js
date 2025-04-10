@@ -10,13 +10,18 @@ module.exports.ListProduct = async (req, res) => {
     let filterby = req.body.filterby
     let category_id = req.body.category_id
     let user_id = req.headers.user_id
+    let product_id = req.body.product_id
+
     let condition = ``
+    let con = ``
+
     let current_date = moment().format('YYYY-MM-DD')
     var page_no = req.body.page_no ? Number(req.body.page_no) : 1
     var limit = req.body.limit ? req.body.limit : 10
     var starting_offset = (limit * page_no) - limit;
     console.log(starting_offset, "starting_offset", limit, page_no);
     var ending_offset = limit * page_no
+
     var getcategory = []
     if (search) {
       condition = ` and (product_name like '%${search}%' or category_name like '%${search}%')`
@@ -49,6 +54,12 @@ module.exports.ListProduct = async (req, res) => {
     } else {
       cond = `order by p.product_id desc`
     }
+
+    if (product_id) {
+      con = `and p.product_id='${product_id}'`
+
+    }
+    let Allproducts = await model.GetAllProducts(con)
 
     let GetProduct = await model.GetProducts(lang, condition, cond, limit, starting_offset);
     let Data = await Promise.all(GetProduct.map(async (element) => {
@@ -95,6 +106,7 @@ module.exports.ListProduct = async (req, res) => {
         current_data_count: Data.length,
         total_data_count: totalData.length,
         data: Data,
+        Allproducts: Allproducts
       });
     } else {
       return res.send({

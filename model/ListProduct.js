@@ -29,7 +29,7 @@ module.exports.GetProducts1 = async (language, condition, cond) => {
 };
 
 module.exports.GetCategories = async (condition) => {
-    console.log(condition,"conditionnnn");
+    console.log(condition, "conditionnnn");
     var Query = `select * from bh_product_categories ${condition}`;
     var data = query(Query);
     return data;
@@ -60,6 +60,17 @@ WHERE bo.offer_start_date <= ? AND bo.offer_end_date >= ? and product_id = ?`
 module.exports.GetImages = async (product_id) => {
     var Query = `SELECT image_file from bh_product_images
  where product_id = ? and image_priority = 0`
+    var data = query(Query, [product_id]);
+    return data;
+
+}
+
+module.exports.GetAllProducts = async (product_id) => {
+    var Query = `SELECT DISTINCT p.*, pc.*, ps.*, t.*, pr.* 
+    FROM bh_products p LEFT JOIN bh_product_categories pc ON pc.category_id = p.category_id AND pc.category_status = 'active' 
+    LEFT JOIN bh_product_stock ps ON ps.product_id = p.product_id 
+    LEFT JOIN bh_product_translations t ON t.product_id = p.product_id AND t.language_id = ?
+    LEFT JOIN bh_product_prices pr ON pr.product_id = p.product_id WHERE p.product_status = 'active' `
     var data = query(Query, [product_id]);
     return data;
 
