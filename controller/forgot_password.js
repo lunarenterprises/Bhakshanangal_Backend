@@ -40,14 +40,47 @@ module.exports.ForgotPassword = async (req, res) => {
       let data = [{
         email: email,
         subject: "Your single-use code",
-        html: ` We received your request for a single-use code to use with your Bhakshanangal account.
-
-                Your single-use code is: ${token}
-              
-                If you didn't request this code, you can safely ignore this email. Someone else might have typed your email address by mistake.
-              
-                Thanks,
-                Bhakshanangal account team `,
+        html: ` <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Forgot Password</title>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tr>
+      <td align="center">
+        <table width="600" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden;">
+          <tr>
+            <td style="background-color: #4a90e2; padding: 20px; text-align: center; color: white;">
+              <h2 style="margin: 0;">Reset Your Password</h2>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 30px;">
+              <p>Hi there,</p>
+              <p>We received a request to reset your password. Use the OTP below to proceed:</p>
+              <div style="text-align: center; margin: 30px 0;">
+                <span style="display: inline-block; padding: 15px 30px; background-color: #f0f0f0; font-size: 24px; letter-spacing: 4px; border-radius: 5px; font-weight: bold;">
+                  ${token}
+                </span>
+              </div>
+              <p>If you didn’t request this, please ignore this email.</p>
+              <p>Thanks,<br>THE BHAKSHANAGAL TEAM</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="background-color: #eeeeee; text-align: center; padding: 20px; font-size: 12px; color: #666;">
+              © 2025 Your Company. All rights reserved.
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+ `
       }];
       // console.log('hai');
 
