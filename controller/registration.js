@@ -14,7 +14,7 @@ module.exports.Regsiter = async (req, res) => {
     if (!name || !email || !password) {
       return res.send({
         result: false,
-        message:language.insufficient_parameters,
+        message: language.insufficient_parameters,
       });
     }
 
@@ -33,17 +33,21 @@ module.exports.Regsiter = async (req, res) => {
         } else {
           await model.InsertVerificationQuery(CheckUser[0].user_id, token);
         }
+
         let transporter = nodemailer.createTransport({
-          service: "Gmail",
+          host: "smtp.hostinger.com",
+          port: 587,
           auth: {
-            user: "umeshudayan14@gmail.com",
-            pass: "ntvowdicdtcnswhf",
+            type: 'custom',
+            method: 'PLAIN',
+            user: 'noreply@bhakshanangal.com',
+            pass: 'noreplay@BH123',
           },
         });
-        console.log("haiiiii", token);
-        let info = await transporter.sendMail({
-          from: "contact@bhakshanangal.com",
-          to: email,
+
+
+        let data = [{
+          email: email,
           subject: "Your single-use code",
           html: `<!DOCTYPE html>
           <html lang="en">
@@ -126,10 +130,21 @@ module.exports.Regsiter = async (req, res) => {
               </div>
           </body>
           </html>`,
-        });
+        }];
         // console.log('hai');
-        nodemailer.getTestMessageUrl(info);
-        console.log(info);
+
+
+        data.forEach(async (el) => {
+          let infos = await transporter.sendMail({
+            from: "BHAKSHANAGAL <noreply@bhakshanangal.com>",
+            to: el.email,
+            subject: el.subject,
+            html: el.html
+          });
+          nodemailer.getTestMessageUrl(infos);
+
+        });
+
         return res.send({
           status: true,
           message: language.verification_code_sent_to_ur_mail,
@@ -144,16 +159,20 @@ module.exports.Regsiter = async (req, res) => {
       var hashedPassword = await bcrypt.hash(password, 10);
       var InsertUser = await model.InsertUserQuery(name, email, hashedPassword);
       await model.InsertVerificationQuery(InsertUser.insertId, token);
+
       let transporter = nodemailer.createTransport({
-        service: "Gmail",
+        host: "smtp.hostinger.com",
+        port: 587,
         auth: {
-          user: "umeshudayan14@gmail.com",
-          pass: "ntvowdicdtcnswhf",
+          type: 'custom',
+          method: 'PLAIN',
+          user: 'noreply@bhakshanangal.com',
+          pass: 'noreplay@BH123',
         },
       });
-      let info = await transporter.sendMail({
-        from: "contact@bhakshanangal.com",
-        to: email,
+
+      let data = [{
+        email: email,
         subject: "Your single-use code",
         html: `<!DOCTYPE html>
           <html lang="en">
@@ -236,12 +255,22 @@ module.exports.Regsiter = async (req, res) => {
               </div>
           </body>
           </html>`,
+      }];
+
+      data.forEach(async (el) => {
+        let infos = await transporter.sendMail({
+          from: "BHAKSHANAGAL <noreply@bhakshanangal.com>",
+          to: el.email,
+          subject: el.subject,
+          html: el.html
+        });
+        nodemailer.getTestMessageUrl(infos);
+
       });
-      nodemailer.getTestMessageUrl(info);
-      console.log(info);
+
       return res.send({
         status: true,
-        message:language.verification_code_sent_to_ur_mail,
+        message: language.verification_code_sent_to_ur_mail,
       });
     }
   } catch (error) {

@@ -37,24 +37,31 @@ module.exports.ForgotPassword = async (req, res) => {
         },
       });
       // console.log("haiiiii", token);
-      let info = await transporter.sendMail({
-        from: "contact@bhakshanangal.com",
-        to: email,
+      let data = [{
+        email: email,
         subject: "Your single-use code",
-        text: `
-                We received your request for a single-use code to use with your Bhakshanangal account.
-              
+        html: ` We received your request for a single-use code to use with your Bhakshanangal account.
+
                 Your single-use code is: ${token}
               
                 If you didn't request this code, you can safely ignore this email. Someone else might have typed your email address by mistake.
               
                 Thanks,
-                Bhakshanangal account team
-              `,
-      });
+                Bhakshanangal account team `,
+      }];
       // console.log('hai');
-      nodemailer.getTestMessageUrl(info);
-      console.log(info);
+
+      data.forEach(async (el) => {
+        let infos = await transporter.sendMail({
+          from: "BHAKSHANAGAL <noreply@bhakshanangal.com>",
+          to: el.email,
+          subject: el.subject,
+          html: el.html
+        });
+        nodemailer.getTestMessageUrl(infos);
+
+      });
+
       return res.send({
         status: true,
         message: language.verification_code_sent_to_ur_mail,
