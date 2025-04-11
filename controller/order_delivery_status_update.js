@@ -145,7 +145,7 @@ async function CheckHtml(status) {
 
     } else if (status == "Out for Delivery") {
         return {
-            subject: "Order Packed",
+            subject: "Out for Delivery",
             html: `<!DOCTYPE html>
 <html lang="en">
 <head>
