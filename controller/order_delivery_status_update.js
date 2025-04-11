@@ -23,7 +23,7 @@ module.exports.UpdateDeliveryStatus = async (req, res) => {
         if (checkadmin.length > 0) {
             let status_update = await model.updatedeliverystatusQuery(delivery_status, order_id)
             let checkdeliverymode = await model.getdeliverymode(delivery_status)
-            console.log(checkdeliverymode[0].delivery_mode_status,"checkdeliverymode[0].delivery_mode_status");
+            console.log(checkdeliverymode[0].delivery_mode_status, "checkdeliverymode[0].delivery_mode_status");
             let result = await CheckHtml(checkdeliverymode[0].delivery_mode_status)
 
             const mailOptions = {
@@ -58,6 +58,8 @@ module.exports.UpdateDeliveryStatus = async (req, res) => {
 
 
     } catch (error) {
+        console.log(error);
+
         return res.send({
             result: false,
             message: error.message
