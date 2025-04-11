@@ -7,10 +7,20 @@ module.exports.CheckAdminQuery = async (user_id) => {
     var data = query(Query, [user_id]);
     return data;
 };
+module.exports.GetOrder = async (user_id) => {
+    var Query = `select * from bh_order_details where order_id = ?`;
+    var data = query(Query, [user_id]);
+    return data;
+};
 
-module.exports.updatedeliverystatusQuery = async (delivery_status, order_id) => {
-    var Query = `update bh_order_details set order_status = ? ,delivery_status = ? where order_id = ?`;
-    var data = await query(Query, [delivery_status, delivery_status, order_id]);
+module.exports.GetUser = async (user_id) => {
+    var Query = `select * from bh_user where user_id = ?`;
+    var data = query(Query, [user_id]);
+    return data;
+};
+module.exports.updatedeliverystatusQuery = async (order_status, delivery_status, order_id) => {
+    var Query = `UPDATE bh_order_details SET order_status = ?, delivery_status = ? WHERE order_id = ?`;
+    var data = await query(Query, [order_status, delivery_status, order_id]);
     return data;
 };
 
