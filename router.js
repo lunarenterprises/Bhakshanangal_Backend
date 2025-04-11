@@ -208,7 +208,7 @@ var { DeleteOrder } = require('./controller/DeleteOrder')
 route.post('/delete-order', DeleteOrder)
 
 var { UpdateDeliveryStatus } = require('./controller/order_delivery_status_update')
-route.post('/update/delivery-status', updatedeliverystatusQuery)
+route.post('/update/delivery-status', UpdateDeliveryStatus)
 
 var { UpdatePaymentStatus } = require('./controller/UpdatePaymentStatus')
 route.post('/update/order-status', UpdatePaymentStatus)
