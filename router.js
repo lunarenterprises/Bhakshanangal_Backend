@@ -207,8 +207,8 @@ route.post("/remove-rating", RemoveRating)
 var { DeleteOrder } = require('./controller/DeleteOrder')
 route.post('/delete-order', DeleteOrder)
 
-var { UpdateDeliveryDate } = require('./controller/UpdateDeliveryStatus')
-route.post('/update/delivery-status', UpdateDeliveryDate)
+var { UpdateDeliveryStatus } = require('./controller/order_delivery_status_update')
+route.post('/update/delivery-status', updatedeliverystatusQuery)
 
 var { UpdatePaymentStatus } = require('./controller/UpdatePaymentStatus')
 route.post('/update/order-status', UpdatePaymentStatus)
@@ -219,7 +219,8 @@ route.post('/delete-category', DeleteCategory)
 var { CreateContactUs } = require('./controller/ContactUs')
 route.post('/contactus', ApikeyVerify, CreateContactUs)
 
-var { ListContactus } = require('./controller/ListContactUs')
+var { ListContactus } = require('./controller/ListContactUs');
+const { updatedeliverystatusQuery } = require("./model/order_delivery_status_update");
 route.get('/list/contactus', ListContactus)
 
 module.exports = route;
