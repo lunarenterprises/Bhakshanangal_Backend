@@ -61,9 +61,14 @@ module.exports.AddProductQuestionAnswer = async (req, res) => {
 
 module.exports.ListProductQuestionAnswers = async (req, res) => {
     try {
-        let { p_id } = req.body
+        let { pq_p_id } = req.body
+        if (!pq_p_id) {
+            return res.send({
+                result: false,
+                message: "Product id is required"
+            })
+        }
         let QuestionAnswerslist = await model.ListProductQuestionAnswersQuery(p_id);
-
         if (QuestionAnswerslist.length > 0) {
             return res.send({
                 result: true,
