@@ -16,7 +16,7 @@ module.exports.AddProductQuestionAnswerQuery = async (pq_answer, pq_id) => {
 };
 
 module.exports.ListProductQuestionAnswersQuery = async (p_id) => {
-    var Query = `SELECT * FROM product_questions where pq_id =? and pq_answer <>'NULL'  `;
+    var Query = `SELECT * FROM product_questions where pq_p_id =? and pq_answer <>'NULL'  `;
     var data = query(Query, [p_id]);
     return data;
 
