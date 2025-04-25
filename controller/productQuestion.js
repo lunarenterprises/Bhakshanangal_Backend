@@ -61,13 +61,13 @@ module.exports.AddProductQuestionAnswer = async (req, res) => {
 
 module.exports.ListProductQuestionAnswers = async (req, res) => {
     try {
-        let { p_id, role } = req.body
+        let { pq_p_id, role } = req.body
         let condition = ''
         if (role) {
             condition = `and pq_answer <>'NULL'`
 
         }
-        let QuestionAnswerslist = await model.ListProductQuestionAnswersQuery(p_id, condition);
+        let QuestionAnswerslist = await model.ListProductQuestionAnswersQuery(pq_p_id, condition);
 
         if (QuestionAnswerslist.length > 0) {
             return res.send({
