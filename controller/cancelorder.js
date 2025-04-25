@@ -5,7 +5,6 @@ const randtoken = require('rand-token');
 var axios = require('axios')
 var nodemailer = require("nodemailer");
 
-
 module.exports.CancelOrder = async (req, res) => {
     try {
         var lang = req.body.lang || "en";
@@ -186,7 +185,7 @@ module.exports.CancelOrder = async (req, res) => {
     <div class="container">
         <h1>Order Cancellation Notification</h1>
         <p>Sir,</p>
-        <p class="order-details">We wanted to inform you that the following order has been successfully canceled:</p>
+        <p class="order-details">We wanted to inform you that the following order has been cancelled:</p>
 
         <table>
             <tr>
@@ -207,8 +206,6 @@ module.exports.CancelOrder = async (req, res) => {
                 <td>${getaddress[0]?.address_phone_number}</td>
             </tr>
         </table>
-
-        <p class="important">Please take note of this cancellation and update your records accordingly.</p>
         
         <p>If you need further assistance, please reach out to the customer directly for more information.</p>
 

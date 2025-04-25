@@ -220,7 +220,21 @@ var { CreateContactUs } = require('./controller/ContactUs')
 route.post('/contactus', ApikeyVerify, CreateContactUs)
 
 var { ListContactus } = require('./controller/ListContactUs');
-const { updatedeliverystatusQuery } = require("./model/order_delivery_status_update");
 route.get('/list/contactus', ListContactus)
+
+var { orderListDownload } = require('./controller/orderlistDownload')
+route.post('/download/order-list', orderListDownload)
+
+var { AddProductQuestion } = require('./controller/productQuestion')
+route.post('/add/product-question', AddProductQuestion)
+
+var { AddProductQuestionAnswer } = require('./controller/productQuestion')
+route.post('/add/product-answer', AddProductQuestionAnswer)
+
+var { ListProductQuestionAnswers } = require('./controller/productQuestion')
+route.post('/list/product-question-answer', ListProductQuestionAnswers)
+
+var { UpdateDeliveryDate } = require('./controller/UpdateDeliveryStatus')
+route.post('/update/delivery-status', UpdateDeliveryDate)
 
 module.exports = route;
