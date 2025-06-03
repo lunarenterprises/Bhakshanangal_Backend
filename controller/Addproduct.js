@@ -2,7 +2,7 @@ var model = require("../model/Addproduct");
 var translatte = require("translatte");
 var { languages } = require("../languages/languageFunc");
 var fs = require("fs");
-const path=require('path')
+const path = require('path')
 const util = require('util')
 const { upload } = require("../components/product_uploader");
 const moment = require("moment");
@@ -202,7 +202,7 @@ module.exports.AddProducts = async (req, res) => {
                 const rawData = await readFile(oldPath);
                 await writeFile(newPath, rawData);
 
-                await model.AddProductImage(product_id, filepathh, index);
+                const InsertImages = await model.AddProductImage(product_id, filepathh, index);
                 if (InsertImages.affectedRows === 0) {
                   return res.send({
                     result: false,
