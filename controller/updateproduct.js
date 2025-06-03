@@ -2,6 +2,7 @@ var model = require('../model/updateproduct')
 var translatte = require('translatte');
 var { languages } = require('../languages/languageFunc');
 var fs = require('fs');
+const path=require('path')
 const { upload } = require("../components/product_uploader");
 const moment = require('moment');
 // const Uploads = upload.array("image")
