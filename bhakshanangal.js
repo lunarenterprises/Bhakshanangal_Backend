@@ -35,7 +35,9 @@ app.use(
     extended: false,
   })
 );
-app.use(bodyparser.json());
+app.use(bodyparser.json({
+  limit: "50mb"
+}));
 app.use(cors());
 app.use(express.static('./', {
   maxAge: '1d' // Cache images for one day
