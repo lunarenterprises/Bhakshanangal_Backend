@@ -32,6 +32,7 @@ var io = require("socket.io")(server, {
 
 app.use(
   bodyparser.urlencoded({
+    limit:"50mb",
     extended: false,
   })
 );
