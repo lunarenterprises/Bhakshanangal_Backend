@@ -2,7 +2,7 @@ var model = require('../model/updateproduct')
 var translatte = require('translatte');
 var { languages } = require('../languages/languageFunc');
 var fs = require('fs');
-const path=require('path')
+const path = require('path')
 const { upload } = require("../components/product_uploader");
 const moment = require('moment');
 // const Uploads = upload.array("image")
@@ -145,6 +145,9 @@ module.exports.UpdateProducts = async (req, res) => {
                     //         }
                     //     });
                     // });
+
+                    const readFile = util.promisify(fs.readFile);
+                    const writeFile = util.promisify(fs.writeFile);
                     const imageFiles = Array.isArray(files.image) ? files.image : [files.image];
                     console.log("imageFiles : ", imageFiles)
                     if (imageFiles.length > 0) {

@@ -187,6 +187,8 @@ module.exports.AddProducts = async (req, res) => {
             //     });
             //   });
 
+            const readFile = util.promisify(fs.readFile);
+            const writeFile = util.promisify(fs.writeFile);
             const imageFiles = Array.isArray(files.image) ? files.image : [files.image];
 
             for (const [index, file] of imageFiles.entries()) {
