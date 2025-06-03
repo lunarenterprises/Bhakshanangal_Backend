@@ -19,9 +19,8 @@ module.exports.UpdateProducts = async (req, res) => {
                         message: "File Upload Failed!",
                         data: err,
                     })
-
                 }
-
+                console.log("files : ", files)
                 var CheckAdmin = await model.CheckAdminQuery(req.headers.user_id)
                 var lang = fields.language;
                 var language = await languages(lang);
