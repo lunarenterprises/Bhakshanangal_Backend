@@ -22,6 +22,7 @@ module.exports.AddOrder = async (req, res) => {
     var amount = req.body.amount
     var Order_id = generateOrderId();
     var address_id = req.body.address_id;
+    let curreny = req.body.currency
 
     let date = moment().format("YYYY-MM-DD");
     let delivery_date = moment(date, "YYYY-MM-DD").add(7, 'days').format("YYYY-MM-DD");
@@ -314,7 +315,7 @@ module.exports.AddOrder = async (req, res) => {
           };
           var paymentLinkData = {
             amount: Number(amount) * 100, // Amount in paisa
-            currency: 'INR',
+            currency: curreny ?? 'INR',
             description: 'payment for product', // You can use the merchantReference or any appropriate description here
             reference_id: Order_id,
             customer: {
