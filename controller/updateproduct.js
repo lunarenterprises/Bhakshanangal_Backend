@@ -151,6 +151,7 @@ module.exports.UpdateProducts = async (req, res) => {
                         //     });
                         // });
                         const imageFiles = Array.isArray(files.image) ? files.image : [files.image];
+                        console.log("imageFiles : ", imageFiles)
 
                         for (const [index, file] of imageFiles.entries()) {
                             try {
@@ -158,7 +159,7 @@ module.exports.UpdateProducts = async (req, res) => {
                                 const filename = file.originalFilename;
                                 const newPath = path.join(process.cwd(), "uploads", "product", filename);
                                 const filepathh = "/uploads/product/" + filename;
-
+                                console.log("filepathh : ", filepathh)
                                 const rawData = await readFile(oldPath);
                                 await writeFile(newPath, rawData);
 
