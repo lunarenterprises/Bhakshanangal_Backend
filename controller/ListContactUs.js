@@ -13,6 +13,7 @@ module.exports.ListContactus = async (req, res) => {
             })
         }
         let contactusList = await model.ListContactus();
+        console.log("contactusList : ", contactusList)
         if (!contactusList) {
             return res.send({
                 result: false,
