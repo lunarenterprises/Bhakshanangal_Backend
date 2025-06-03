@@ -13,16 +13,16 @@ module.exports.ListContactus = async (req, res) => {
             })
         }
         let contactusList = await model.ListContactus();
-        if (contactusList.length > 0) {
+        if (!contactusList) {
+            return res.send({
+                result: false,
+                message: "Failed to retrive data"
+            })
+        } else {
             return res.send({
                 result: true,
                 message: "Successfully retrived Data",
                 contactusList
-            })
-        } else {
-            return res.send({
-                result: false,
-                message: "Failed to retrive data"
             })
         }
     } catch (error) {
