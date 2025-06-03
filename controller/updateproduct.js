@@ -120,36 +120,63 @@ module.exports.UpdateProducts = async (req, res) => {
 
                     }
                     if (files.length > 0) {
-                        Object.keys(files).forEach((element) => {
-                            var oldPath = files[element]["filepath"];
-                            var newPath =
-                                process.cwd() +
-                                "/uploads/product/" +
-                                files[element]["originalFilename"];
+                        // Object.keys(files).forEach((element) => {
+                        //     var oldPath = files[element]["filepath"];
+                        //     var newPath =
+                        //         process.cwd() +
+                        //         "/uploads/product/" +
+                        //         files[element]["originalFilename"];
 
-                            let rawData = fs.readFileSync(oldPath);
-                            // console.log(newPath, "new");
-                            fs.writeFile(newPath, rawData, async function (err) {
-                                if (err) console.log(err);
-                                if (element == "image") {
-                                    let filepathh =
-                                        "uploads/product/" + files[element]["originalFilename"];
-                                    await model.AddProductImage(product_id, filepathh, 0);
-                                } else if (element == "image1") {
-                                    let filepathh =
-                                        "uploads/product/" + files[element]["originalFilename"];
-                                    await model.AddProductImage(product_id, filepathh, 1);
-                                } else if (element == "image2") {
-                                    let filepathh =
-                                        "uploads/product/" + files[element]["originalFilename"];
-                                    await model.AddProductImage(product_id, filepathh, 2);
-                                } else if (element == "image3") {
-                                    let filepathh =
-                                        "uploads/product/" + files[element]["originalFilename"];
-                                    await model.AddProductImage(product_id, filepathh, 3);
+                        //     let rawData = fs.readFileSync(oldPath);
+                        //     // console.log(newPath, "new");
+                        //     fs.writeFile(newPath, rawData, async function (err) {
+                        //         if (err) console.log(err);
+                        //         if (element == "image") {
+                        //             let filepathh =
+                        //                 "uploads/product/" + files[element]["originalFilename"];
+                        //             await model.AddProductImage(product_id, filepathh, 0);
+                        //         } else if (element == "image1") {
+                        //             let filepathh =
+                        //                 "uploads/product/" + files[element]["originalFilename"];
+                        //             await model.AddProductImage(product_id, filepathh, 1);
+                        //         } else if (element == "image2") {
+                        //             let filepathh =
+                        //                 "uploads/product/" + files[element]["originalFilename"];
+                        //             await model.AddProductImage(product_id, filepathh, 2);
+                        //         } else if (element == "image3") {
+                        //             let filepathh =
+                        //                 "uploads/product/" + files[element]["originalFilename"];
+                        //             await model.AddProductImage(product_id, filepathh, 3);
+                        //         }
+                        //     });
+                        // });
+                        const imageFiles = Array.isArray(files.image) ? files.image : [files.image];
+
+                        for (const [file, index] of imageFiles) {
+                            try {
+                                const oldPath = file.filepath;
+                                const filename = file.originalFilename;
+                                const newPath = path.join(process.cwd(), "uploads", "product", filename);
+                                const filepathh = "/uploads/product/" + filename;
+
+                                const rawData = await readFile(oldPath);
+                                await writeFile(newPath, rawData);
+
+                                await model.AddProductImage(product_id, filepathh, index);
+                                if (InsertImages.affectedRows === 0) {
+                                    return res.send({
+                                        result: false,
+                                        message: "Failed to insert image"
+                                    });
                                 }
-                            });
-                        });
+                            } catch (err) {
+                                console.error("File handling error:", err);
+                                return res.status(500).send({
+                                    result: false,
+                                    message: "Internal server error while updating product"
+                                });
+                            }
+                        }
                     }
                     if (priceinINR) {
                         var Addprice = await model.AddProductPrice(product_id, priceinINR)

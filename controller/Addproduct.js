@@ -69,74 +69,74 @@ module.exports.AddProducts = async (req, res) => {
             message: language.product_already_exists,
           });
         } else {
-        let product_nameInArab = await translatte(product_name, { to: "ar" });
-        product_nameInArab = product_nameInArab.text;
-        let product_nameInFrench = await translatte(product_name, { to: "fr" });
-        product_nameInFrench = product_nameInFrench.text;
-        let product_nameInHindi = await translatte(product_name, { to: "hi" });
-        product_nameInHindi = product_nameInHindi.text;
-        let product_nameInmalayalam = await translatte(product_name, {
-          to: "ml",
-        });
-        product_nameInmalayalam = product_nameInmalayalam.text;
+          let product_nameInArab = await translatte(product_name, { to: "ar" });
+          product_nameInArab = product_nameInArab.text;
+          let product_nameInFrench = await translatte(product_name, { to: "fr" });
+          product_nameInFrench = product_nameInFrench.text;
+          let product_nameInHindi = await translatte(product_name, { to: "hi" });
+          product_nameInHindi = product_nameInHindi.text;
+          let product_nameInmalayalam = await translatte(product_name, {
+            to: "ml",
+          });
+          product_nameInmalayalam = product_nameInmalayalam.text;
 
-        let product_descriptionInArab = await translatte(product_description, {
-          to: "ar",
-        });
-        product_descriptionInArab = product_descriptionInArab.text;
-        let product_descriptionInFrench = await translatte(
-          product_description,
-          { to: "fr" }
-        );
-        product_descriptionInFrench = product_descriptionInFrench.text;
-        let product_descriptionInHindi = await translatte(product_description, {
-          to: "hi",
-        });
-        product_descriptionInHindi = product_descriptionInHindi.text;
-        let product_descriptionInmalayalam = await translatte(
-          product_description,
-          { to: "ml" }
-        );
-        product_descriptionInmalayalam = product_descriptionInmalayalam.text;
-        // let product_nameInenglish = 'en'
-        // let product_nameInArabcode = 'ar'
-        // let product_nameInFrenchcode = 'fr'
-        // let product_nameInHindicode = 'hi'
-        // let product_nameInmalayalamcode = 'ml'
-        let array = [
-          {
-            lannum: 0,
-            lancod: "en",
-            langP: product_name,
-            langD: product_description,
-          },
-          {
-            lannum: 1,
-            lancod: "ar",
-            langP: product_nameInArab,
-            langD: product_descriptionInArab,
-          },
-          {
-            lannum: 2,
-            lancod: "fr",
-            langP: product_nameInFrench,
-            langD: product_descriptionInFrench,
-          },
-          {
-            lannum: 3,
-            lancod: "hi",
-            langP: product_nameInHindi,
-            langD: product_descriptionInHindi,
-          },
-          {
-            lannum: 4,
-            lancod: "ml",
-            langP: product_nameInmalayalam,
-            langD: product_descriptionInmalayalam,
-          },
-        ];
+          let product_descriptionInArab = await translatte(product_description, {
+            to: "ar",
+          });
+          product_descriptionInArab = product_descriptionInArab.text;
+          let product_descriptionInFrench = await translatte(
+            product_description,
+            { to: "fr" }
+          );
+          product_descriptionInFrench = product_descriptionInFrench.text;
+          let product_descriptionInHindi = await translatte(product_description, {
+            to: "hi",
+          });
+          product_descriptionInHindi = product_descriptionInHindi.text;
+          let product_descriptionInmalayalam = await translatte(
+            product_description,
+            { to: "ml" }
+          );
+          product_descriptionInmalayalam = product_descriptionInmalayalam.text;
+          // let product_nameInenglish = 'en'
+          // let product_nameInArabcode = 'ar'
+          // let product_nameInFrenchcode = 'fr'
+          // let product_nameInHindicode = 'hi'
+          // let product_nameInmalayalamcode = 'ml'
+          let array = [
+            {
+              lannum: 0,
+              lancod: "en",
+              langP: product_name,
+              langD: product_description,
+            },
+            {
+              lannum: 1,
+              lancod: "ar",
+              langP: product_nameInArab,
+              langD: product_descriptionInArab,
+            },
+            {
+              lannum: 2,
+              lancod: "fr",
+              langP: product_nameInFrench,
+              langD: product_descriptionInFrench,
+            },
+            {
+              lannum: 3,
+              lancod: "hi",
+              langP: product_nameInHindi,
+              langD: product_descriptionInHindi,
+            },
+            {
+              lannum: 4,
+              lancod: "ml",
+              langP: product_nameInmalayalam,
+              langD: product_descriptionInmalayalam,
+            },
+          ];
 
-       
+
           var Product_insert = await model.AddProduct(
             category,
             quantity,
@@ -151,40 +151,68 @@ module.exports.AddProducts = async (req, res) => {
           if (Product_insert.affectedRows > 0) {
             let getproduct = Product_insert.insertId;
             let productStock = await model.AddProductStock(stock, getproduct);
-            console.log(files);
-            
-              Object.keys(files).forEach((element) => {
-                console.log(element, "element");
+            // console.log(files);
 
-                var oldPath = files[element]["filepath"];
-                var newPath =
-                  process.cwd() +
-                  "/uploads/product/" +
-                  files[element]["originalFilename"];
+            //   Object.keys(files).forEach((element) => {
+            //     console.log(element, "element");
 
-                let rawData = fs.readFileSync(oldPath);
-                // console.log(newPath, "new");
-                fs.writeFile(newPath, rawData, async function (err) {
-                  if (err) console.log(err);
-                  if (element == "image") {
-                    let filepathh =
-                      "uploads/product/" + files[element]["originalFilename"];
-                    await model.AddProductImage(getproduct, filepathh, 0);
-                  } else if (element == "image1") {
-                    let filepathh =
-                      "uploads/product/" + files[element]["originalFilename"];
-                    await model.AddProductImage(getproduct, filepathh, 1);
-                  } else if (element == "image2") {
-                    let filepathh =
-                      "uploads/product/" + files[element]["originalFilename"];
-                    await model.AddProductImage(getproduct, filepathh, 2);
-                  } else if (element == "image3") {
-                    let filepathh =
-                      "uploads/product/" + files[element]["originalFilename"];
-                    await model.AddProductImage(getproduct, filepathh, 3);
-                  }
+            //     var oldPath = files[element]["filepath"];
+            //     var newPath =
+            //       process.cwd() +
+            //       "/uploads/product/" +
+            //       files[element]["originalFilename"];
+
+            //     let rawData = fs.readFileSync(oldPath);
+            //     // console.log(newPath, "new");
+            //     fs.writeFile(newPath, rawData, async function (err) {
+            //       if (err) console.log(err);
+            //       if (element == "image") {
+            //         let filepathh =
+            //           "uploads/product/" + files[element]["originalFilename"];
+            //         await model.AddProductImage(getproduct, filepathh, 0);
+            //       } else if (element == "image1") {
+            //         let filepathh =
+            //           "uploads/product/" + files[element]["originalFilename"];
+            //         await model.AddProductImage(getproduct, filepathh, 1);
+            //       } else if (element == "image2") {
+            //         let filepathh =
+            //           "uploads/product/" + files[element]["originalFilename"];
+            //         await model.AddProductImage(getproduct, filepathh, 2);
+            //       } else if (element == "image3") {
+            //         let filepathh =
+            //           "uploads/product/" + files[element]["originalFilename"];
+            //         await model.AddProductImage(getproduct, filepathh, 3);
+            //       }
+            //     });
+            //   });
+
+            const imageFiles = Array.isArray(files.image) ? files.image : [files.image];
+
+            for (const [file, index] of imageFiles) {
+              try {
+                const oldPath = file.filepath;
+                const filename = file.originalFilename;
+                const newPath = path.join(process.cwd(), "uploads", "product", filename);
+                const filepathh = "/uploads/product/" + filename;
+
+                const rawData = await readFile(oldPath);
+                await writeFile(newPath, rawData);
+
+                await model.AddProductImage(product_id, filepathh, index);
+                if (InsertImages.affectedRows === 0) {
+                  return res.send({
+                    result: false,
+                    message: "Failed to insert image"
+                  });
+                }
+              } catch (err) {
+                console.error("File handling error:", err);
+                return res.status(500).send({
+                  result: false,
+                  message: "Internal server error while updating product"
                 });
-              });
+              }
+            }
 
             let Addprice = await model.AddProductPrice(getproduct, priceinINR);
             array.forEach(async (el) => {
