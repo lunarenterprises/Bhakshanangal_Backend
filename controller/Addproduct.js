@@ -188,7 +188,7 @@ module.exports.AddProducts = async (req, res) => {
 
             const imageFiles = Array.isArray(files.image) ? files.image : [files.image];
 
-            for (const [file, index] of imageFiles) {
+            for (const [index, file] of imageFiles.entries()) {
               try {
                 const oldPath = file.filepath;
                 const filename = file.originalFilename;
