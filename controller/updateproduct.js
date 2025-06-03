@@ -146,30 +146,31 @@ module.exports.UpdateProducts = async (req, res) => {
                     // });
                     const imageFiles = Array.isArray(files.image) ? files.image : [files.image];
                     console.log("imageFiles : ", imageFiles)
+                    if (imageFiles.length > 0) {
+                        for (const [index, file] of imageFiles.entries()) {
+                            try {
+                                const oldPath = file?.filepath;
+                                const filename = file?.originalFilename;
+                                const newPath = path.join(process.cwd(), "uploads", "product", filename);
+                                const filepathh = "/uploads/product/" + filename;
+                                console.log("filepathh : ", filepathh)
+                                const rawData = await readFile(oldPath);
+                                await writeFile(newPath, rawData);
 
-                    for (const [index, file] of imageFiles.entries()) {
-                        try {
-                            const oldPath = file.filepath;
-                            const filename = file.originalFilename;
-                            const newPath = path.join(process.cwd(), "uploads", "product", filename);
-                            const filepathh = "/uploads/product/" + filename;
-                            console.log("filepathh : ", filepathh)
-                            const rawData = await readFile(oldPath);
-                            await writeFile(newPath, rawData);
-
-                            await model.AddProductImage(product_id, filepathh, index);
-                            if (InsertImages.affectedRows === 0) {
-                                return res.send({
+                                await model.AddProductImage(product_id, filepathh, index);
+                                if (InsertImages.affectedRows === 0) {
+                                    return res.send({
+                                        result: false,
+                                        message: "Failed to insert image"
+                                    });
+                                }
+                            } catch (err) {
+                                console.error("File handling error:", err);
+                                return res.status(500).send({
                                     result: false,
-                                    message: "Failed to insert image"
+                                    message: "Internal server error while updating product"
                                 });
                             }
-                        } catch (err) {
-                            console.error("File handling error:", err);
-                            return res.status(500).send({
-                                result: false,
-                                message: "Internal server error while updating product"
-                            });
                         }
                     }
                     if (priceinINR) {
