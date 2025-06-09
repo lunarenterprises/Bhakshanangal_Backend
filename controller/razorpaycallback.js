@@ -55,7 +55,7 @@ module.exports.RazorpayCallback = async (req, res) => {
         auth: {
             type: 'custom',
             method: 'PLAIN',
-            user: 'noreply@bhakshanangal.com',
+            user: 'nocontact@bhakshanangal.com',
             pass: 'Bhkl@123',
         },
     });
@@ -277,7 +277,7 @@ module.exports.RazorpayCallback = async (req, res) => {
 
     data.forEach(async (el) => {
         let infos = await transporter.sendMail({
-            from: "BHAKSHANAGAL <noreply@bhakshanangal.com>",
+            from: "BHAKSHANAGAL <nocontact@bhakshanangal.com>",
             to: el.email,
             subject: el.subject,
             html: el.html
