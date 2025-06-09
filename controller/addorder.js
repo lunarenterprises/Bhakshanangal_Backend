@@ -68,7 +68,7 @@ module.exports.AddOrder = async (req, res) => {
               type: 'custom',
               method: 'PLAIN',
               user: 'noreply@bhakshanangal.com',
-              pass: 'noreplay@BH123',
+              pass: 'Bhkl@123',
             },
           });
 

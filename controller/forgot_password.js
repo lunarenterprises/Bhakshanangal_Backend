@@ -33,7 +33,7 @@ module.exports.ForgotPassword = async (req, res) => {
         port: 587,
         auth: {
           user: "noreply@bhakshanangal.com",
-          pass: "noreplay@BH123",
+          pass: "Bhkl@123",
         },
       });
       // console.log("haiiiii", token);
