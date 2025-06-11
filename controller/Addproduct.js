@@ -191,33 +191,35 @@ module.exports.AddProducts = async (req, res) => {
             const readFile = util.promisify(fs.readFile);
             const writeFile = util.promisify(fs.writeFile);
             const imageFiles = Array.isArray(files.image) ? files.image : [files.image];
+            if (files) {
 
-            for (const [index, file] of imageFiles.entries()) {
-              try {
-                const oldPath = file.filepath;
-                const filename = file.originalFilename;
-                const newPath = path.join(process.cwd(), "uploads", "product", filename);
-                const filepathh = "/uploads/product/" + filename;
 
-                const rawData = await readFile(oldPath);
-                await writeFile(newPath, rawData);
+              for (const [index, file] of imageFiles.entries()) {
+                try {
+                  const oldPath = file.filepath;
+                  const filename = file.originalFilename;
+                  const newPath = path.join(process.cwd(), "uploads", "product", filename);
+                  const filepathh = "/uploads/product/" + filename;
 
-                const InsertImages = await model.AddProductImage(getproduct, filepathh, index);
-                if (InsertImages.affectedRows === 0) {
-                  return res.send({
+                  const rawData = await readFile(oldPath);
+                  await writeFile(newPath, rawData);
+
+                  const InsertImages = await model.AddProductImage(getproduct, filepathh, index);
+                  if (InsertImages.affectedRows === 0) {
+                    return res.send({
+                      result: false,
+                      message: "Failed to insert image"
+                    });
+                  }
+                } catch (err) {
+                  console.error("File handling error:", err);
+                  return res.status(500).send({
                     result: false,
-                    message: "Failed to insert image"
+                    message: "Internal server error while updating product"
                   });
                 }
-              } catch (err) {
-                console.error("File handling error:", err);
-                return res.status(500).send({
-                  result: false,
-                  message: "Internal server error while updating product"
-                });
               }
             }
-
             let Addprice = await model.AddProductPrice(getproduct, priceinINR);
             array.forEach(async (el) => {
               await model.AddTranslatedProducts(
