@@ -202,7 +202,7 @@ module.exports.AddProducts = async (req, res) => {
                 const rawData = await readFile(oldPath);
                 await writeFile(newPath, rawData);
 
-                const InsertImages = await model.AddProductImage(product_id, filepathh, index);
+                const InsertImages = await model.AddProductImage(getproduct, filepathh, index);
                 if (InsertImages.affectedRows === 0) {
                   return res.send({
                     result: false,
