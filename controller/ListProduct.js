@@ -17,7 +17,7 @@ module.exports.ListProduct = async (req, res) => {
 
     let current_date = moment().format('YYYY-MM-DD')
     var page_no = req.body.page_no ? Number(req.body.page_no) : 1
-    var limit = req.body.limit ? req.body.limit : 10
+    var limit = req.body.limit ? req.body.limit : 20
     var starting_offset = (limit * page_no) - limit;
     console.log(starting_offset, "starting_offset", limit, page_no);
     var ending_offset = limit * page_no
