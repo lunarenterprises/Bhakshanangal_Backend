@@ -65,9 +65,6 @@ module.exports.ListProduct = async (req, res) => {
     let Data = await Promise.all(GetProduct.map(async (element) => {
       // GetProduct.forEach(async (element) => {
       let wishlistcheck = await model.Getwishlist(user_id, element.product_id)
-      console.log("user_id : ", user_id)
-      console.log("product_id : ", element.product_id)
-      console.log("wishlistcheck : ", wishlistcheck)
       let imagesInproduct = await model.GetImages(element.product_id)
       // imagesInproduct.forEach(el => {
       //   el.image_file = 'bhakshanangal/' + el.image_file
