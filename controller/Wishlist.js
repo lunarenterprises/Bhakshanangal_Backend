@@ -23,24 +23,21 @@ module.exports.AddWishlist = async (req, res) => {
       });
     }
     let checkwish = await model.CheckWish(product_id, user_id);
-    console.log("checkwish : ", checkwish)
     if (checkwish.length > 0) {
       let removewish = await model.RemoveWish(product_id, user_id);
-      console.log("removewish : ", removewish)
       if (removewish.affectedRows > 0) {
-        return res.send({
-          result: true,
-          message: language.Product_wishlist_remove_failed,
-        });
-      } else {
         return res.send({
           result: true,
           message: language.Product_removed_from_wishlist,
         });
+      } else {
+        return res.send({
+          result: false,
+          message: language.Product_wishlist_remove_failed,
+        });
       }
     } else {
       let addwish = await model.AddWish(product_id, user_id);
-      console.log("addwish : ", addwish)
       if (addwish.affectedRows > 0) {
         return res.send({
           result: true,
@@ -48,7 +45,7 @@ module.exports.AddWishlist = async (req, res) => {
         });
       } else {
         return res.send({
-          result: true,
+          result: false,
           message: language.Product_added_wishlist_failed,
         });
       }
