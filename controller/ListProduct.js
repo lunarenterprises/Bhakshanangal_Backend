@@ -65,6 +65,9 @@ module.exports.ListProduct = async (req, res) => {
     let Data = await Promise.all(GetProduct.map(async (element) => {
       // GetProduct.forEach(async (element) => {
       let wishlistcheck = await model.Getwishlist(user_id, element.product_id)
+      console.log("user_id : ", user_id)
+      console.log("product_id : ", element.product_id)
+      console.log("wishlistcheck : ", wishlistcheck)
       let imagesInproduct = await model.GetImages(element.product_id)
       // imagesInproduct.forEach(el => {
       //   el.image_file = 'bhakshanangal/' + el.image_file
@@ -72,11 +75,11 @@ module.exports.ListProduct = async (req, res) => {
       element.image_file = imagesInproduct[0]?.image_file
       element.product_rating = Number(element.product_rating).toFixed(1)
 
-      if (wishlistcheck.length > 0) {
-        var wishlist = true
-      } else {
-        var wishlist = false
-      }
+      // if (wishlistcheck.length > 0) {
+      //   var wishlist = true
+      // } else {
+      //   var wishlist = false
+      // }
       let discountCheck = await model.GetDiscount(current_date, element.product_id)
       if (discountCheck.length > 0) {
         var Discount = Number(discountCheck[0].offer_discount) + '%'
@@ -86,7 +89,7 @@ module.exports.ListProduct = async (req, res) => {
         var Discount = null
       }
 
-      element.wishlist = wishlist
+      element.wishlist = wishlistcheck.length > 0 ? true : false
       element.discount = Discount
       element.offer_price = Offer_Price
 
