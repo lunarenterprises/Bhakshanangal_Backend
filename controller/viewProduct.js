@@ -19,21 +19,16 @@ module.exports.ViewProducts = async (req, res) => {
         let Data = await Promise.all(getproduct.map(async (element) => {
             if (user_id) {
                 let getwishlist = await model.Getwishlist(user_id, element.product_id)
-                if (getwishlist.length > 0) {
-                    var wishlist = true
-                } else {
-                    var wishlist = false
-                }
-                element.wishlist = wishlist
+                element.wishlist = getwishlist.length > 0 ? true : false
             }
             let imagesInproduct = await model.GetImages(element.product_id)
             imagesInproduct.forEach(el => {
-                el.image_file =  el.image_file
+                el.image_file = el.image_file
             });
             let imagesInMain = await model.GetImagess(element.product_id)
 
             element.product_image = imagesInproduct
-            element.image_file =  imagesInMain[0].image_file
+            element.image_file = imagesInMain[0].image_file
             element.delivery_date = delivery_date
             element.product_rating = Number(element.product_rating).toFixed(1)
             return element
