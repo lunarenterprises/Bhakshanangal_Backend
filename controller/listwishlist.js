@@ -5,13 +5,13 @@ module.exports.ListWishlist = async (req, res) => {
     try {
         var lang = req.body.lang || "en";
         var language = await languages(lang);
-        var { user_id } = req.headers;
-        if (!user_id) {
-            return res.send({
-                result: false,
-                message: "User id is required"
-            })
-        }
+        const { user_id } = req?.user || req?.headers
+        // if (!user_id) {
+        //     return res.send({
+        //         result: false,
+        //         message: "User id is required"
+        //     })
+        // }
         let checkuser = await model.CheckUser(user_id);
         if (checkuser.length > 0) {
             let checkwish = await model.wishcheck(user_id);

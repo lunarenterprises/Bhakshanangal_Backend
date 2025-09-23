@@ -6,9 +6,8 @@ module.exports.ViewProfile = async (req, res) => {
     try {
         var lang = req.body.language;
         var language = await languages(lang);
-        let user_id = req.body.user_id ? req.body.user_id : req.headers.user_id;
+        const { user_id } = req?.user || req?.headers
         let CheckUser = await model.CheckUserQuery(user_id)
-
         if (CheckUser.length > 0) {
             var obj = {
                 user_id: CheckUser[0].user_id,
@@ -25,7 +24,7 @@ module.exports.ViewProfile = async (req, res) => {
                     state: CheckUser[0].address_state,
                     pincode: CheckUser[0].address_pincode,
                     phone_number: CheckUser[0].address_phone_number,
-                    alternate_phone_number:CheckUser[0].address_alt_phone_number,
+                    alternate_phone_number: CheckUser[0].address_alt_phone_number,
                 }
             }
             return res.send({
@@ -48,6 +47,4 @@ module.exports.ViewProfile = async (req, res) => {
             message: error.message
         })
     }
-
-
 }

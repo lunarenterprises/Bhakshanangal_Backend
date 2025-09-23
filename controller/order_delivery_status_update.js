@@ -16,7 +16,7 @@ module.exports.UpdateDeliveryStatus = async (req, res) => {
         });
         var lang = req.body.lang || "en";
         var language = await languages(lang);
-        let user_id = req.headers.user_id
+        const { user_id } = req?.user || req?.headers
         let order_id = req.body.order_id
         let delivery_status = req.body.delivery_status
         let order_status = delivery_status

@@ -3,6 +3,7 @@ var { languages } = require("../languages/languageFunc");
 
 module.exports.AddAddresses = async (req, res) => {
   try {
+    const { user_id } = req?.user || req?.headers
     var lang = req.body.language;
     var language = await languages(lang);
     let {
@@ -33,7 +34,7 @@ module.exports.AddAddresses = async (req, res) => {
       });
     }
 
-    let CheckUser = await model.CheckUserQuery(req.headers.user_id);
+    let CheckUser = await model.CheckUserQuery(user_id);
     if (CheckUser.length > 0) {
       let Addaddress = await model.AddAddressQuery(
         full_name,
@@ -45,9 +46,9 @@ module.exports.AddAddresses = async (req, res) => {
         building_name,
         area_name,
         landmark,
-        req.headers.user_id
+        user_id
       );
-      let SetAddress = await model.setAddress(Addaddress.insertId, req.headers.user_id);
+      let SetAddress = await model.setAddress(Addaddress.insertId, user_id);
       return res.send({
         result: true,
         message: language.address_successfully_added,

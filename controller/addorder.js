@@ -17,7 +17,7 @@ module.exports.AddOrder = async (req, res) => {
     var language = await languages(lang);
     var payment_method = req.body.payment_method;
     var product_details = req.body.product_details;
-    var user_id = req.headers.user_id;
+    const { user_id } = req?.user || req?.headers
     var gift_card = req.body.gift_card;
     var amount = req.body.amount
     var Order_id = generateOrderId();

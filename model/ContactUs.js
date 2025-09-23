@@ -2,14 +2,13 @@ var db = require("../db/db");
 var util = require("util")
 const query = util.promisify(db.query).bind(db);
 
-module.exports.InsertContactus = async (user_id, name, email, message) => {
+module.exports.InsertContactus = async (name, email, message) => {
     var Query = `insert into bh_contact_us (
     name,
     email,
-    message,
-    user_id
-    )values(?,?,?,?)`;
-    var data = query(Query, [name, email, message, user_id]);
+    message
+    )values(?,?,?)`;
+    var data = query(Query, [name, email, message]);
     return data;
 };
 

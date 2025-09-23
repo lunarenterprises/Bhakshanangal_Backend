@@ -4,6 +4,7 @@ var { languages } = require("../languages/languageFunc");
 
 module.exports.AddCouponOrOffer = async (req, res) => {
     try {
+        const { user_id } = req?.user || req?.headers
         var lang = req.body.language;
         var language = await languages(lang);
         var ValidFrom = req.body.valid_from;
@@ -42,13 +43,13 @@ module.exports.AddCouponOrOffer = async (req, res) => {
             })
         }
 
-        let CheckUser = await model.CheckUserQuery(req.headers.user_id);
+        let CheckUser = await model.CheckUserQuery(user_id);
         if (CheckUser.length > 0) {
             if (coupon == true) {
                 if (!coupon_code) {
                     coupon_code = coupongenerator()
                 }
-                console.log(coupon_code,"coupon_code");
+                console.log(coupon_code, "coupon_code");
                 var checkCoupon = await model.GetcouponCheck(name)
                 if (checkCoupon.length > 0) {
                     let coupon_id = checkCoupon[0].coupon_id
@@ -66,7 +67,7 @@ module.exports.AddCouponOrOffer = async (req, res) => {
                             });
                         });
                     }
-                  
+
                 } else {
                     let getCoupon_id = await model.AddCouponQuery(name, coupon_code, discount, ValidFrom, ValidTo)
                     let coupon_id = getCoupon_id[0].coupon_id

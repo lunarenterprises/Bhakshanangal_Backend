@@ -5,7 +5,7 @@ module.exports.ProductDropDown = async (req, res) => {
     try {
         var lang = req.body.lang || 'en';
         var language = await languages(lang);
-        var user_id = req.headers.user_id;
+        const { user_id } = req?.user || req?.headers
         let search = req.body.search
         let checkadmin = await model.CheckAdmin(user_id);
         if (checkadmin.length > 0) {

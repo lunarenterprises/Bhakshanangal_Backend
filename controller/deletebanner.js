@@ -5,7 +5,7 @@ module.exports.DeleteBanner = async (req, res) => {
   try {
     var lang = req.body.language || "en";
     var language = await languages(lang);
-    var user_id = req.headers.user_id;
+    const { user_id } = req?.user || req?.headers
     var banner_id = req.body.banner_id;
     let checkadmin = await model.CheckAdminQuery(user_id);
     if (checkadmin.length > 0) {

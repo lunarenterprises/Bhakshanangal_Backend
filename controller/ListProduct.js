@@ -9,7 +9,7 @@ module.exports.ListProduct = async (req, res) => {
     let search = req.body.search;
     let filterby = req.body.filterby
     let category_id = req.body.category_id
-    let user_id = req.headers.user_id
+    let user_id = req.headers?.user_id
     let product_id = req.body.product_id
 
     let condition = ``

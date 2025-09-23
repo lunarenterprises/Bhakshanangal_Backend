@@ -3,6 +3,7 @@ var { languages } = require("../languages/languageFunc");
 
 module.exports.EditAddresses = async (req, res) => {
   try {
+    const { user_id } = req?.user || req?.headers
     var lang = req.body.language;
     var language = await languages(lang);
     let {
@@ -35,7 +36,7 @@ module.exports.EditAddresses = async (req, res) => {
       });
     }
 
-    let CheckUser = await model.CheckUserQuery(req.headers.user_id);
+    let CheckUser = await model.CheckUserQuery(user_id);
     if (CheckUser.length > 0) {
       await model.UpdateAddressQuery(
         full_name,
@@ -47,7 +48,7 @@ module.exports.EditAddresses = async (req, res) => {
         building_name,
         area_name,
         landmark,
-        req.headers.user_id,
+        user_id,
         address_id
       );
 

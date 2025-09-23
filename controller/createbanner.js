@@ -7,6 +7,7 @@ const Uploads = upload.array("image");
 module.exports.AddBanner = async (req, res) => {
     try {
         Uploads(req, res, async (err) => {
+            const { user_id } = req?.user || req?.headers
             let { banner_name, banner_description, banner_priority } = req.body;
             var lang = req.body.language;
             var language = await languages(lang);
@@ -27,7 +28,7 @@ module.exports.AddBanner = async (req, res) => {
                     message: language.image_upload_failed
                 })
             }
-            let CheckAdmin = await model.CheckAdminQuery(req.headers.user_id);
+            let CheckAdmin = await model.CheckAdminQuery(user_id);
             if (CheckAdmin.length > 0) {
                 let CheckCategory = await model.Getbanner(banner_name);
                 if (CheckCategory.length > 0) {

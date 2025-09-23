@@ -7,7 +7,7 @@ module.exports.EditProfile = async (req, res) => {
   try {
     var lang = req.body.language;
     var language = await languages(lang);
-    let user_id = req.headers.user_id;
+    const { user_id } = req?.user || req?.headers;
     let FirtsName = req.body.first_name;
     let LastName = req.body.last_name;
     let email = req.body.email;
@@ -132,7 +132,7 @@ module.exports.EditProfile = async (req, res) => {
         message: language.user_does_not_exist,
       });
     }
-  } catch(error) {
+  } catch (error) {
     console.log(error);
     return res.send({
       result: false,

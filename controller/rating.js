@@ -7,7 +7,7 @@ module.exports.ProductRating = async (req, res, next) => {
     try {
         var lang = req.body.language;
         var language = await translate.languages(lang);
-        var user_id = req.headers.user_id;
+        const { user_id } = req?.user || req?.headers
         let product_id = req.body.product_id;
         let rating = req.body.rating;
         let comment = req.body.comment;

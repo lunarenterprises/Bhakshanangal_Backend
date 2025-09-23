@@ -2,13 +2,10 @@ var model = require("../model/viewCart.js");
 var { languages } = require("../languages/languageFunc");
 
 module.exports.ViewCart = async (req, res) => {
-
     try {
-
-
         var lang = req.body.language || 'en';
         var language = await languages(lang);
-        let user_id = req.headers.user_id;
+        const { user_id } = req?.user || req?.headers
 
         let CheckUser = await model.CheckUserQuery(user_id);
         if (CheckUser.length > 0) {

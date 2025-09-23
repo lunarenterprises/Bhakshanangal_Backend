@@ -5,12 +5,13 @@ var moment = require("moment");
 
 module.exports.ValidateCoupon = async (req, res) => {
   try {
+    const { user_id } = req?.user || req?.headers
     var lang = req.body.language;
     var language = await languages(lang);
     var coupon_code = req.body.coupon_code;
     var amount = req.body.amount;
     var current_date = moment().format("YYYY-MM-DD");
-    let CheckUser = await model.CheckUserQuery(req.headers.user_id);
+    let CheckUser = await model.CheckUserQuery(user_id);
     console.log(CheckUser.length, "is it working??");
     if (CheckUser.length > 0) {
       let checkcoupon = await model.CheckCoupon(coupon_code, current_date);

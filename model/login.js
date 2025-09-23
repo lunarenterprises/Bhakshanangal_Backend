@@ -53,3 +53,8 @@ module.exports.InsertUserAppsQuery = async (
   var data = query(Query, [user_id, device_token, device_id, device_os, api_key]);
   return data;
 };
+
+module.exports.CheckUserWithId = async (user_id) => {
+  let Query = `select * from bh_user where user_id=?`
+  return await query(Query, [user_id])
+}
