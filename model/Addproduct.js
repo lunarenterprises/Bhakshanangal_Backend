@@ -102,3 +102,14 @@ module.exports.AddVariantImages = async (variant_id, filepath) => {
   let Query = `insert into bh_product_variant_images (pv_variant_id,pv_file) values(?,?)`
   return await query(Query, [variant_id, filepath])
 }
+
+module.exports.GetProductTranslation = async (product_id) => {
+    let Query = `
+        SELECT t.*, l.language_name, l.language_code
+        FROM bh_product_translations t
+        JOIN bh_languages l 
+          ON l.language_id = t.language_id
+        WHERE t.product_id = ?
+    `;
+    return await query(Query, [product_id]);
+}

@@ -254,3 +254,79 @@ module.exports.AddProductVariants = async (req, res) => {
     })
   }
 }
+
+
+module.exports.EditProduct = async (req, res) => {
+  try {
+    // const { product_id, product_name, product_description, category, shipping = false, cod = false, refund = false, free_delivery = false, new_arrival = false, lang = 'en' } = req.body
+    // const language = await languages(lang);
+    // if (!product_id) {
+    //   return res.send({
+    //     result: false,
+    //     message: language.insufficient_parameters,
+    //   });
+    // }
+    // const checkProductExist = await model.CheckProductWithId(product_id)
+    // if (checkProductExist.length === 0) {
+    //   return res.send({
+    //     result: false,
+    //     message: "Product not found."
+    //   })
+    // }
+    // const productTranslations = await model.GetProductTranslation(product_id)
+    // let CheckProduct = await model.CheckProductQuery(product_name);
+    // if (CheckProduct.length > 0) {
+    //   return res.send({
+    //     result: false,
+    //     message: language.product_already_exists,
+    //   });
+    // }
+    // const checkCategory = await model.CheckCategory(category)
+    // if (category && checkCategory.length === 0) {
+    //   return res.send({
+    //     result: false,
+    //     message: "Category not found"
+    //   })
+    // }
+    // let updates = [];
+    // // const productData =
+    // if (product_name !== undefined) {
+    //   productName.push({
+    //     lannum: 0,
+    //     lancod: "en",
+    //     langP: product_name,
+    //   })
+    //   let product_nameInArab = await translatte(product_name, { to: "ar" });
+    //   productName.push({
+    //     lannum: 0,
+    //     lancod: "ar",
+    //     langP: product_nameInArab.text,
+    //   })
+
+    //   let product_nameInFrench = await translatte(product_name, { to: "fr" });
+    //   productName.push({
+    //     lannum: 0,
+    //     lancod: "fr",
+    //     langP: product_nameInFrench.text,
+    //   })
+    //   let product_nameInHindi = await translatte(product_name, { to: "hi" });
+    //   productName.push({
+    //     lannum: 0,
+    //     lancod: "hi",
+    //     langP: product_nameInHindi.text,
+    //   })
+    //   let product_nameInmalayalam = await translatte(product_name, {
+    //     to: "ml",
+    //   });
+    //   product_nameInmalayalam = product_nameInmalayalam.text;
+    //   productName.push({
+    //     lannum: 0,
+    //     lancod: "ml",
+    //     langP: product_nameInmalayalam.text,
+    //   })
+    // };
+    // if (product_name !== undefined) productName.push(`u_profile_for='${product_name}'`);
+  } catch (error) {
+    return res.send({})
+  }
+}

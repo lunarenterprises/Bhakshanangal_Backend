@@ -3,7 +3,7 @@ var util = require("util")
 const query = util.promisify(db.query).bind(db);
 
 module.exports.GetProducts = async (language, condition, cond, limit, page_no) => {
-    var Query = `select distinct p.product_id,stock_stock as product_stock,product_name,price,quantity,product_unit,p.product_rating,p.product_rating_count from bh_products p
+    var Query = `select distinct p.product_id,stock_stock as product_stock,product_name,price,quantity,p.product_rating,p.product_rating_count from bh_products p
     inner join bh_product_categories pc on pc.category_id = p.category_id and category_status ='active'
     inner join bh_product_stock ps on p.product_id = ps.product_id
     inner join bh_product_translations t on t.product_id = p.product_id
@@ -16,7 +16,7 @@ module.exports.GetProducts = async (language, condition, cond, limit, page_no) =
 };
 
 module.exports.GetProducts1 = async (language, condition, cond) => {
-    var Query = `select distinct p.product_id,stock_stock as product_stock,product_name,price,quantity,product_unit,image_file,p.product_rating,p.product_rating_count from bh_products p
+    var Query = `select distinct p.product_id,stock_stock as product_stock,product_name,price,quantity,image_file,p.product_rating,p.product_rating_count from bh_products p
      inner join bh_product_categories pc on pc.category_id = p.category_id and category_status ='active'
       inner join bh_product_stock ps on p.product_id = ps.product_id
     inner join bh_product_translations t on t.product_id = p.product_id

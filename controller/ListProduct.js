@@ -156,7 +156,7 @@ module.exports.ListAllProduct = async (req, res) => {
 
 module.exports.ViewProduct = async (req, res) => {
   try {
-    const { product_id, lang } = req.body
+    const { product_id, lang='en' } = req.body
     if (!product_id) {
       return res.send({
         result: false,
@@ -166,6 +166,7 @@ module.exports.ViewProduct = async (req, res) => {
     const checkProduct = await model.GetProductById(product_id)
     const variants = await model.GetProductVariants(product_id)
     const translations = await model.GetProductTranslation(product_id)
+    const translationData = translations.find(item => item.language_code === lang);
     if (checkProduct.length === 0) {
       return res.send({
         result: false,
@@ -176,11 +177,13 @@ module.exports.ViewProduct = async (req, res) => {
       result: true,
       message: "Data retrieved successfully",
       data: {
-        ...checkProduct[0], variants: variants.map((variant) => ({
+        ...checkProduct[0],
+        product_name: translationData?.product_name,
+        description: translationData?.description,
+        variants: variants.map((variant) => ({
           ...variant,
           images: JSON.parse(variant.images)
-        })),
-        translations
+        }))
       }
     })
   } catch (error) {
