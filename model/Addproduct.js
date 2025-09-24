@@ -98,6 +98,11 @@ module.exports.AddProductVariant = async (product_id, size, unit, stock, price, 
   return await query(Query, [product_id, size, unit, stock, price, discount])
 }
 
+module.exports.UpdateProductVariant = async (updateString, variant_id) => {
+  let Query = `update bh_product_variants SET ${updateString} WHERE bpv_id=?`
+  return await query(Query, [variant_id])
+}
+
 module.exports.AddVariantImages = async (variant_id, filepath) => {
   let Query = `insert into bh_product_variant_images (pv_variant_id,pv_file) values(?,?)`
   return await query(Query, [variant_id, filepath])
@@ -117,4 +122,19 @@ module.exports.GetProductTranslation = async (product_id) => {
 module.exports.UpdateProduct = async (updateString, product_id) => {
   let Query = `update bh_products SET ${updateString} WHERE product_id=?`
   return await query(Query, [product_id])
+}
+
+module.exports.DeleteAllTranslations = async (product_id) => {
+  let Query = `delete from bh_product_translations where product_id=?`
+  return await query(Query, [product_id])
+}
+
+module.exports.CheckProductVariant = async (variant_id) => {
+  let Query = `select * from bh_product_variants where bpv_id=?`
+  return await query(Query, [variant_id])
+}
+
+module.exports.GetProductVariantImages = async (variant_id) => {
+  let Query = `select * from bh_product_variant_images where pv_variant_id=?`
+  return await query(Query, [variant_id])
 }

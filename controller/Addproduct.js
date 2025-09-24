@@ -304,9 +304,10 @@ module.exports.EditProduct = async (req, res) => {
         langD: product_descriptionInmalayalam,
       },
     ];
+    await model.DeleteAllTranslations(product_id)
     array.forEach(async (el) => {
       await model.AddTranslatedProducts(
-        Product_insert.insertId,
+        product_id,
         el.lannum,
         el.langP,
         el.langD
@@ -320,7 +321,7 @@ module.exports.EditProduct = async (req, res) => {
     if (free_delivery !== undefined) updates.push(`free_delivery='${free_delivery}'`);
     if (updates.length > 0) {
       const updateString = updates.join(', ');
-      let updated = await model.UpdateProduct(updateString, user_id);
+      let updated = await model.UpdateProduct(updateString, product_id);
       if (updated.affectedRows === 0) {
         return res.send({
           result: false,
@@ -334,5 +335,88 @@ module.exports.EditProduct = async (req, res) => {
     })
   } catch (error) {
     return res.send({})
+  }
+}
+
+
+module.exports.EditProductVariant = async (req, res) => {
+  try {
+    const form = new formidable.IncomingForm({ multiples: true });
+    form.parse(req, async function (err, fields, files) {
+      if (err) {
+        return res.send({
+          success: false,
+          message: "File Upload Failed!",
+          data: err,
+        });
+      }
+      const { product_variant_id, size, unit, stock, price, discount, lang = 'en' } = fields
+      const language = await languages(lang);
+      if (!product_variant_id) {
+        return res.send({
+          result: false,
+          message: "Product variant id is required"
+        })
+      }
+      const checkProductVariant = await model.CheckProductVariant(product_variant_id)
+      if (checkProductVariant.length === 0) {
+        return res.send({
+          result: false,
+          message: "Product variant not found."
+        })
+      }
+      const variantImages = await model.GetProductVariantImages(product_variant_id)
+      if (variantImages.length === 0 && (!files?.images || files?.images?.length === 0)) {
+        return res.send({
+          result: false,
+          message: "Images is required"
+        })
+      }
+      let imageArray = Array.isArray(files.images) ? files.images : [files.images];
+      const uploadDir = path.join(process.cwd(), "uploads", "product");
+      // Ensure the upload directory exists
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+      }
+
+      for (let image of imageArray) {
+        const oldPath = image.filepath
+        const newPath = path.join(uploadDir, image.originalFilename);
+
+        try {
+          const rawData = fs.readFileSync(oldPath);
+          fs.writeFileSync(newPath, rawData); // ✅ synchronous write
+          const imagePath = "/uploads/product/" + image.originalFilename
+          await model.AddVariantImages(created.insertId, imagePath)
+        } catch (err) {
+          console.error("File save error:", err);
+        }
+      }
+      let updates = [];
+      if (size !== undefined) updates.push(`bpv_size='${size}'`);
+      if (unit !== undefined) updates.push(`bpv_unit='${unit}'`);
+      if (stock !== undefined) updates.push(`bpv_stock='${stock}'`);
+      if (price !== undefined) updates.push(`bpv_price='${price}'`);
+      if (discount !== undefined) updates.push(`bpv_discount='${discount}'`);
+      if (updates.length > 0) {
+        const updateString = updates.join(', ');
+        let updated = await model.UpdateProduct(updateString, product_variant_id);
+        if (updated.affectedRows === 0) {
+          return res.send({
+            result: false,
+            message: "Failed to update product variant"
+          })
+        }
+      }
+      return res.send({
+        result: true,
+        message: "Product updated successfully"
+      })
+    })
+  } catch (error) {
+    return res.send({
+      result: false,
+      message: error.message
+    })
   }
 }

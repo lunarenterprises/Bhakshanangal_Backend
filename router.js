@@ -34,12 +34,13 @@ var { RemoveAddress } = require("./controller/removeAddress");
 // route.post("/remove-address", ApikeyVerify, RemoveAddress);
 route.post("/remove-address", verifyToken, authorize('user'), RemoveAddress);
 
-var { AddProducts, AddProductVariants, EditProduct } = require("./controller/Addproduct");
+var { AddProducts, AddProductVariants, EditProduct, EditProductVariant } = require("./controller/Addproduct");
 // route.post("/addproduct", verifyToken, authorize('admin'), AddProducts);
 route.post("/addproduct", AddProducts);
 // route.post("/product/addvariant", verifyToken, authorize('admin'),AddProductVariants);
-route.post("/product/addvariant", AddProductVariants);
 route.post("/editproduct", EditProduct);
+route.post("/product/addvariant", AddProductVariants);
+route.post("/product/editvariant", EditProductVariant);
 
 var { ListAllProduct, ViewProduct } = require("./controller/ListProduct");
 route.post("/productlist", ListAllProduct);
@@ -130,9 +131,11 @@ var { AddWishlist } = require("./controller/Wishlist");
 // route.post("/wishlist", ApikeyVerify, AddWishlist)
 route.post("/wishlist", verifyToken, authorize('user'), AddWishlist)
 
-var { DeleteProduct } = require("./controller/deleteproduct");
+var { DeleteProduct, DeleteProductVariant, DeleteProductVariantImage } = require("./controller/deleteproduct");
 // route.post("/delete-product", ApikeyVerify, DeleteProduct)
 route.post("/delete-product", verifyToken, authorize('admin'), DeleteProduct)
+route.post("/delete-variant", verifyToken, authorize('admin'), DeleteProductVariant)
+route.post("/delete-variant-image", verifyToken, authorize('admin'), DeleteProductVariantImage)
 
 var { DeliveryStatusList } = require('./controller/deliverystatuslist')
 // route.post("/delivery/status/list", ApikeyVerify, DeliveryStatusList)
