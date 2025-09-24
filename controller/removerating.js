@@ -5,7 +5,7 @@ module.exports.RemoveRating = async(req,res) => {
     try {
         var lang = req.body.lang || "en";
         var language = await languages(lang);
-        var user_id = req.headers.user_id;
+        const { user_id } = req?.user || req?.headers
         var rating_id = req.body.rating_id;
         let checkuser = await model.CheckUser(user_id)
         if(checkuser.length > 0){

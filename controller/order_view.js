@@ -6,7 +6,7 @@ module.exports.OrderVIew = async (req, res) => {
         var lang = req.body.lang || 'en'
         var language = await languages(lang);
         var order_id = req.body.order_id
-        var user_id = req.headers.user_id
+        const { user_id } = req?.user || req?.headers
         if (!order_id) {
             return res.send({
                 result: false,

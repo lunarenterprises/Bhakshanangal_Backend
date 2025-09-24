@@ -7,7 +7,7 @@ module.exports.addCart = async (req, res) => {
     var language = await languages(lang);
     let { product_id, quantity, unit } = req.body;
     let quantities = quantity ? quantity : 1
-    let user_id = req.headers.user_id;
+    const { user_id } = req?.user || req?.headers;
     var checkUser = await model.checkUser(user_id);
     var checkProducts = true;
     if (checkUser.length > 0) {

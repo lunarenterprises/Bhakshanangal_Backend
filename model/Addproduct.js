@@ -16,26 +16,27 @@ where p.product_name = ? and r.product_status = 'active'`;
   return data;
 };
 
+module.exports.CheckCategory = async (category_id) => {
+  let Query = `select * from bh_product_categories where category_id=?`
+  return await query(Query, [category_id])
+}
+
 module.exports.AddProduct = async (
   category_id,
-  quantity,
   shipping,
   cash_on_delivery,
   refundable,
   free_delivery,
-  unit,
-  date
+  new_arrival
 ) => {
-  var Query = `insert into bh_products(category_id,quantity,shipping,cash_on_delivery,refundable,free_delivery,product_unit,created_at)values(?,?,?,?,?,?,?,?)`;
+  var Query = `insert into bh_products(category_id,shipping,cash_on_delivery,refundable,free_delivery,new_arrival)values(?,?,?,?,?,?)`;
   var data = query(Query, [
     category_id,
-    quantity,
     shipping,
     cash_on_delivery,
     refundable,
     free_delivery,
-    unit,
-    date
+    new_arrival
   ]);
   return data;
 };
@@ -48,7 +49,7 @@ module.exports.GetProduct = async () => {
 
 module.exports.AddProductStock = async (stock, product_id) => {
   var Query = `insert into bh_product_stock(stock_stock,product_id,stock_status)values(?,?,?)`;
-  var data = query(Query, [stock, product_id,'instock']);
+  var data = query(Query, [stock, product_id, 'instock']);
   return data;
 };
 
@@ -85,3 +86,30 @@ module.exports.AddTranslatedProducts = async (
   ]);
   return data;
 };
+
+
+module.exports.CheckProductWithId = async (product_id) => {
+  let Query = `select * from bh_products where product_id=?`
+  return await query(Query, [product_id])
+}
+
+module.exports.AddProductVariant = async (product_id, size, unit, stock, price, discount) => {
+  let Query = `insert into bh_product_variants (bpv_product_id,bpv_size,bpv_unit,bpv_stock,bpv_price,bpv_discount) values(?,?,?,?,?,?)`
+  return await query(Query, [product_id, size, unit, stock, price, discount])
+}
+
+module.exports.AddVariantImages = async (variant_id, filepath) => {
+  let Query = `insert into bh_product_variant_images (pv_variant_id,pv_file) values(?,?)`
+  return await query(Query, [variant_id, filepath])
+}
+
+module.exports.GetProductTranslation = async (product_id) => {
+    let Query = `
+        SELECT t.*, l.language_name, l.language_code
+        FROM bh_product_translations t
+        JOIN bh_languages l 
+          ON l.language_id = t.language_id
+        WHERE t.product_id = ?
+    `;
+    return await query(Query, [product_id]);
+}

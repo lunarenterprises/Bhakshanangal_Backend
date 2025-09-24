@@ -5,7 +5,7 @@ module.exports.AddWishlist = async (req, res) => {
   try {
     var lang = req.body.lang || "en";
     var language = await languages(lang);
-    var user_id = req.headers.user_id;
+    const { user_id } = req?.user || req?.headers
     var product_id = req.body.product_id;
     // var Id = req.body.Id;
     let checkuser = await model.CheckUser(user_id);

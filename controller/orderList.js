@@ -5,7 +5,7 @@ module.exports.orderList = async (req, res) => {
     try {
         var lang = req.body.lang || 'en'
         var language = await languages(lang);
-        var user_id = req.headers.user_id;
+        const { user_id } = req?.user || req?.headers
         var search = req.body.search;
 
         let selectUser = await model.UserSelect(user_id)

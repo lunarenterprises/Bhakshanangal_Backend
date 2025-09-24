@@ -7,7 +7,7 @@ module.exports.ListUser = async (req, res) => {
         var lang = req.body.lang || 'en';
         var search = req.body.search
         var language = await languages(lang);
-        var user_id = req.headers.user_id;
+        const { user_id } = req?.user || req?.headers
         let condition = ``
         if (search) {
             condition = `and (lower(user_name) like '${search.toLowerCase()}%' or lower(user_email) like '${search.toLowerCase()}%' or user_mobile like '${search}%')`

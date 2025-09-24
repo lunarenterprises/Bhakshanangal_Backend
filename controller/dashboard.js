@@ -4,10 +4,9 @@ var moment = require('moment');
 
 module.exports.Dashboard = async (req, res) => {
     try {
-        let { } = req.body
         var lang = req.body.language || 'en';
         var language = await languages(lang);
-        let user_id = req.headers.user_id
+        const { user_id } = req?.user || req?.headers
         var current_date = moment().format('YYYY-MM-DD')
         console.log(current_date, "date");
         let CheckAdminUser = await model.CheckAdminQuery(user_id)
@@ -17,7 +16,7 @@ module.exports.Dashboard = async (req, res) => {
             let GetOrderdetails = await model.Orderlist(lang, current_date);
             let TopSelling = await model.SellingTop(lang, current_date)
             // console.log(TopSelling, 'whakhajsgdfouyasdgfadfgaskdjhfgaksdhfg');
-        
+
             // console.log(GetOrderdetails);
             var productCounts = {};
 
@@ -48,7 +47,7 @@ module.exports.Dashboard = async (req, res) => {
             });
 
 
-            if(GetOrderdetails.length > 0){
+            if (GetOrderdetails.length > 0) {
                 return res.send({
                     result: true,
                     message: language.data_retrieved,
@@ -56,13 +55,13 @@ module.exports.Dashboard = async (req, res) => {
                     product_details: productCounts,
                     topselling: TopSelling
                 })
-            }else{
+            } else {
                 return res.send({
                     result: false,
                     message: language.data_not_found
                 })
             }
-           
+
         } else {
             return res.send({
                 result: false,

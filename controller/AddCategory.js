@@ -9,6 +9,7 @@ module.exports.AddCategory = async (req, res) => {
   try {
     Uploads(req, res, async (err) => {
       let { category_name } = req.body;
+      const { user_id } = req?.user || req?.headers
       var lang = req.body.language;
       var language = await languages(lang);
       if (!category_name) {
@@ -28,7 +29,7 @@ module.exports.AddCategory = async (req, res) => {
         req.files && req.files.length > 0
           ? `uploads/category/` + req.files[0].filename
           : null;
-      let CheckAdmin = await model.CheckAdminQuery(req.headers.user_id);
+      let CheckAdmin = await model.CheckAdminQuery(user_id);
       if (CheckAdmin.length > 0) {
         let CheckCategory = await model.Getcategory(category_name);
         if (CheckCategory.length > 0) {

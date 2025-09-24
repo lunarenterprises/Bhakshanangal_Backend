@@ -4,7 +4,7 @@ var {languages} = require("../languages/languageFunc");
 
 module.exports.RemoveCoupon = async(req,res) =>{
     try {
-        var user_id = req.headers.user_id;
+        const { user_id } = req?.user || req?.headers
         var coupon_id = req.body.coupon_id;
         var lang = req.body.lang || "en";
         var language = await languages(lang);

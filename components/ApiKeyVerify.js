@@ -8,7 +8,7 @@ module.exports.ApikeyVerify = async (req, res, next) => {
     try {
         var lang = req.body.language;
         var language = await languages(lang);
-        var user_id = req.headers.user_id;
+        const { user_id } = req?.user || req?.headers
         var api_key = req.headers.api_key;
 
         if (!user_id || !api_key) {
@@ -18,7 +18,7 @@ module.exports.ApikeyVerify = async (req, res, next) => {
             })
         } else {
             let CheckVerification = await CheckVerificationQuery(parseInt(user_id), api_key)
-            console.log(CheckVerification,parseInt(user_id), api_key,1);
+            console.log(CheckVerification, parseInt(user_id), api_key, 1);
             if (CheckVerification.length > 0) {
                 let user_info = await UserInfoQuery(user_id);
                 if (user_info.length > 0) {

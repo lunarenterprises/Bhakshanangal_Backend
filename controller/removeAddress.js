@@ -1,9 +1,9 @@
 var model = require("../model/removeAddress");
 var { languages } = require("../languages/languageFunc");
-const { log } = require("util");
 
-module.exports.RemoveAddress = async (req,res) => {
+module.exports.RemoveAddress = async (req, res) => {
   try {
+    const { user_id } = req?.user || req?.headers
     var lang = req.body.language;
     var language = await languages(lang);
     let { address_id } = req.body;
@@ -14,7 +14,7 @@ module.exports.RemoveAddress = async (req,res) => {
         message: language.insufficient_parameters,
       });
     }
-    let CheckUser = await model.CheckUserQuery(req.headers.user_id);
+    let CheckUser = await model.CheckUserQuery(user_id);
     if (CheckUser.length > 0) {
       await model.DeleteAddressQuery(address_id);
 

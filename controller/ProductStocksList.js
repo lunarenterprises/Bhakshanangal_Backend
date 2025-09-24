@@ -5,7 +5,7 @@ module.exports.ProductStocksList = async (req, res) => {
     try {
         var lang = req.body.lang || "en";
         var language = await languages(lang);
-        let user_id = req.headers.user_id;
+        const { user_id } = req?.user || req?.headers
         let CheckUsers = await model.CheckUser(user_id)
         var page_no = req.body.page_no ? Number(req.body.page_no) : 1
         var limit = req.body.limit ? req.body.limit : 10
@@ -22,15 +22,15 @@ module.exports.ProductStocksList = async (req, res) => {
 
             if (productStockdetails.length > 0) {
                 return res.send({
-                    result:true,
-                    message:language.data_retrieved,
-                    list:productStockdetails,
-                    totalcount:TotalCount.length
+                    result: true,
+                    message: language.data_retrieved,
+                    list: productStockdetails,
+                    totalcount: TotalCount.length
                 })
-            }else{
+            } else {
                 return res.send({
-                    result:false,
-                    message:language.data_not_found
+                    result: false,
+                    message: language.data_not_found
                 })
             }
         } else {

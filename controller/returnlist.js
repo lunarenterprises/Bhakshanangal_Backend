@@ -5,7 +5,7 @@ module.exports.ReturnList = async (req, res) => {
     try {
         var lang = req.body.lang || "en";
         var language = await languages(lang);
-        var user_id = req.headers.user_id;
+        const { user_id } = req?.user || req?.headers
         var page_no = req.body.page_no ? Number(req.body.page_no) : 1
         var limit = req.body.limit ? req.body.limit : 15
         var starting_offset = (limit * page_no) - limit;
