@@ -21,7 +21,7 @@ module.exports.AddProducts = async (req, res) => {
     //   }
 
     // let CheckAdmin = await model.CheckAdminQuery(req.headers.user_id);
-    const { product_name, product_description, category, shipping = false, cod = false, refund = false, free_delivery = false, new_arrival = false, lang } = req.body
+    const { product_name, product_description, category, shipping = false, cod = false, refund = false, free_delivery = false, new_arrival = false, lang = 'en' } = req.body
     const language = await languages(lang);
     if (
       !product_name ||
@@ -177,3 +177,80 @@ module.exports.AddProducts = async (req, res) => {
     });
   }
 };
+
+
+module.exports.AddProductVariants = async (req, res) => {
+  try {
+    var form = new formidable.IncomingForm({ multiples: true });
+    form.parse(req, async function (err, fields, files) {
+      if (err) {
+        return res.send({
+          success: false,
+          message: "File Upload Failed!",
+          data: err,
+        });
+      }
+      const { product_id, size, unit, stock, price, discount, lang = 'en' } = fields
+      const language = await languages(lang);
+      if (!product_id || !size || !unit || !stock || !price || !discount) {
+        return res.send({
+          result: false,
+          message: "Product id, size, unit, stock, price and discount are required"
+        })
+      }
+
+      if (!files?.images || files?.images?.length === 0) {
+        return res.send({
+          result: false,
+          message: "Images is required"
+        })
+      }
+
+      const checkProduct = await model.CheckProductWithId(product_id)
+      if (checkProduct.length === 0) {
+        return res.send({
+          result: false,
+          message: "Product not found."
+        })
+      }
+      const created = await model.AddProductVariant(product_id, size, unit, stock, price, discount)
+      if (created.affectedRows > 0) {
+        let imageArray = Array.isArray(files.images) ? files.images : [files.images];
+        const uploadDir = path.join(process.cwd(), "uploads", "product");
+        // Ensure the upload directory exists
+        if (!fs.existsSync(uploadDir)) {
+          fs.mkdirSync(uploadDir, { recursive: true });
+        }
+
+        for (let image of imageArray) {
+          const oldPath = image.filepath
+          const newPath = path.join(uploadDir, image.originalFilename);
+
+          try {
+            const rawData = fs.readFileSync(oldPath);
+            fs.writeFileSync(newPath, rawData); // ✅ synchronous write
+            const imagePath = "/uploads/product/" + image.originalFilename
+            await model.AddVariantImages(created.insertId, imagePath)
+          } catch (err) {
+            console.error("File save error:", err);
+          }
+        }
+        res.send({
+          result: true,
+          message: "Product variant added successfully"
+        })
+      } else {
+        return res.send({
+          result: false,
+          message: "Failed to add product variant. Please try again later"
+        })
+      }
+    })
+
+  } catch (error) {
+    return res.send({
+      result: false,
+      message: error.message
+    })
+  }
+}

@@ -65,13 +65,90 @@ module.exports.GetImages = async (product_id) => {
 
 }
 
-module.exports.GetAllProducts = async (product_id) => {
-    var Query = `SELECT DISTINCT p.*, pc.*, ps.*, t.*, pr.* 
-    FROM bh_products p LEFT JOIN bh_product_categories pc ON pc.category_id = p.category_id AND pc.category_status = 'active' 
-    LEFT JOIN bh_product_stock ps ON ps.product_id = p.product_id 
-    LEFT JOIN bh_product_translations t ON t.product_id = p.product_id AND t.language_id = ?
-    LEFT JOIN bh_product_prices pr ON pr.product_id = p.product_id WHERE p.product_status = 'active' `
-    var data = query(Query, [product_id]);
-    return data;
+// module.exports.GetAllProducts = async () => {
+//     var Query = `SELECT DISTINCT p.*, pc.*, ps.*, t.*, pr.* 
+//     FROM bh_products p LEFT JOIN bh_product_categories pc ON pc.category_id = p.category_id AND pc.category_status = 'active' 
+//     LEFT JOIN bh_product_stock ps ON ps.product_id = p.product_id 
+//     LEFT JOIN bh_product_translations t ON t.product_id = p.product_id
+//     LEFT JOIN bh_product_prices pr ON pr.product_id = p.product_id WHERE p.product_status = 'active' `
+//     var data = query(Query);
+//     return data;
+// }
 
+module.exports.GetAllProducts = async ({ search = '', page = 1, limit = 10 }) => {
+    const offset = (page - 1) * limit;
+
+    let Query = `
+        SELECT p.*, pc.*
+        FROM bh_products p
+        LEFT JOIN bh_product_categories pc 
+               ON pc.category_id = p.category_id AND pc.category_status = 'active'
+        WHERE p.product_status = 'active'
+    `;
+
+    const params = [];
+
+    // Add search filter if provided
+    if (search) {
+        Query += ` AND (p.product_name LIKE ? OR pc.category_name LIKE ?)`;
+        params.push(`%${search}%`, `%${search}%`);
+    }
+
+    // Order by latest created
+    Query += ` ORDER BY p.created_at DESC`;
+
+    // Pagination
+    Query += ` LIMIT ? OFFSET ?`;
+    params.push(Number(limit), Number(offset));
+
+    return await query(Query, params);
+}
+
+
+
+module.exports.GetProductVariants = async (product_id) => {
+    let Query = `
+        SELECT v.bpv_id,
+        bpv_size,
+        bpv_unit,
+        bpv_stock,
+        bpv_price,
+        bpv_discount,
+               COALESCE(JSON_ARRAYAGG(
+                   JSON_OBJECT(
+                       'pv_id', i.pv_id,
+                       'pv_file', i.pv_file,
+                       'pv_created_at', i.pv_created_at,
+                       'pv_updated_at', i.pv_updated_at
+                   )
+               ), JSON_ARRAY()) AS images
+        FROM bh_product_variants v
+        LEFT JOIN bh_product_variant_images i 
+               ON i.pv_variant_id = v.bpv_id
+        WHERE v.bpv_product_id = ?
+        GROUP BY v.bpv_id
+    `;
+    return await query(Query, [product_id]);
+}
+
+
+module.exports.GetProductTranslation = async (product_id) => {
+    let Query = `
+        SELECT t.*, l.language_name, l.language_code
+        FROM bh_product_translations t
+        JOIN bh_languages l 
+          ON l.language_id = t.language_id
+        WHERE t.product_id = ?
+    `;
+    return await query(Query, [product_id]);
+}
+
+
+module.exports.GetProductById = async (product_id) => {
+    let Query = `SELECT p.*, pc.*
+        FROM bh_products p
+        LEFT JOIN bh_product_categories pc 
+               ON pc.category_id = p.category_id AND pc.category_status = 'active'
+        WHERE p.product_status = 'active' and p.product_id=?`
+    return await query(Query, [product_id])
 }

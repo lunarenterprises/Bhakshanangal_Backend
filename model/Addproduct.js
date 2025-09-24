@@ -86,3 +86,19 @@ module.exports.AddTranslatedProducts = async (
   ]);
   return data;
 };
+
+
+module.exports.CheckProductWithId = async (product_id) => {
+  let Query = `select * from bh_products where product_id=?`
+  return await query(Query, [product_id])
+}
+
+module.exports.AddProductVariant = async (product_id, size, unit, stock, price, discount) => {
+  let Query = `insert into bh_product_variants (bpv_product_id,bpv_size,bpv_unit,bpv_stock,bpv_price,bpv_discount) values(?,?,?,?,?,?)`
+  return await query(Query, [product_id, size, unit, stock, price, discount])
+}
+
+module.exports.AddVariantImages = async (variant_id, filepath) => {
+  let Query = `insert into bh_product_variant_images (pv_variant_id,pv_file) values(?,?)`
+  return await query(Query, [variant_id, filepath])
+}

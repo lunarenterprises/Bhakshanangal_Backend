@@ -34,11 +34,16 @@ var { RemoveAddress } = require("./controller/removeAddress");
 // route.post("/remove-address", ApikeyVerify, RemoveAddress);
 route.post("/remove-address", verifyToken, authorize('user'), RemoveAddress);
 
-var { AddProducts } = require("./controller/Addproduct");
-route.post("/addproduct", verifyToken, authorize('admin'), AddProducts);
+var { AddProducts, AddProductVariants, } = require("./controller/Addproduct");
+// route.post("/addproduct", verifyToken, authorize('admin'), AddProducts);
+route.post("/addproduct", AddProducts);
+// route.post("/product/addvariant", verifyToken, authorize('admin'),AddProductVariants);
+route.post("/product/addvariant", AddProductVariants);
 
-var { ListProduct } = require("./controller/ListProduct");
-route.post("/productlist", ListProduct);
+var { ListAllProduct, ViewProduct } = require("./controller/ListProduct");
+route.post("/productlist", ListAllProduct);
+route.post('/viewproduct', ViewProduct)
+
 
 var { ViewProducts } = require("./controller/viewProduct");
 route.post("/productview", ViewProducts);
