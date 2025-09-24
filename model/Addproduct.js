@@ -104,12 +104,17 @@ module.exports.AddVariantImages = async (variant_id, filepath) => {
 }
 
 module.exports.GetProductTranslation = async (product_id) => {
-    let Query = `
+  let Query = `
         SELECT t.*, l.language_name, l.language_code
         FROM bh_product_translations t
         JOIN bh_languages l 
           ON l.language_id = t.language_id
         WHERE t.product_id = ?
     `;
-    return await query(Query, [product_id]);
+  return await query(Query, [product_id]);
+}
+
+module.exports.UpdateProduct = async (updateString, product_id) => {
+  let Query = `update bh_products SET ${updateString} WHERE product_id=?`
+  return await query(Query, [product_id])
 }
