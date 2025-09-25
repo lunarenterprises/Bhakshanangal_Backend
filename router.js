@@ -99,11 +99,13 @@ route.post('/listoffer', ListOffer)
 
 var { orderList } = require('./controller/orderList')
 // route.post('/orderlist', ApikeyVerify, orderList)
-route.post('/orderlist', verifyToken, authorize('user'), orderList)
+// route.post('/orderlist', verifyToken, authorize('user'), orderList)
+route.post('/orderlist', orderList)
 
 var { Dashboard } = require('./controller/dashboard')
 // route.post('/dashboard', ApikeyVerify, Dashboard)
-route.post('/dashboard', verifyToken, authorize('user'), Dashboard)
+route.post('/dashboard', verifyToken, authorize('admin'), Dashboard)
+// route.post('/dashboard', Dashboard)
 
 var { ListUser } = require("./controller/listuser");
 route.post("/list-user", verifyToken, authorize('admin'), ListUser);
@@ -147,7 +149,8 @@ route.post("/delivery/status/update", verifyToken, authorize('admin'), UpdateDel
 
 var { OrderVIew } = require('./controller/order_view')
 // route.post("/order/view", ApikeyVerify, OrderVIew)
-route.post("/order/view", verifyToken, authorize('admin'), OrderVIew)
+// route.post("/order/view", verifyToken, authorize('admin'), OrderVIew)
+route.post("/order/view", OrderVIew)
 
 var { PaymentList } = require('./controller/paymentlist')
 // route.post("/payment/list", ApikeyVerify, PaymentList)
