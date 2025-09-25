@@ -12,6 +12,8 @@ module.exports.AddProducts = async (req, res) => {
   try {
     const { product_name, product_description, category, shipping = false, cod = false, refund = false, free_delivery = false, new_arrival = false, lang = 'en' } = req.body
     const language = await languages(lang);
+    console.log("Body",req.body);
+    
     if (
       !product_name ||
       !product_description ||
