@@ -54,7 +54,7 @@ module.exports.SubCategoryList = async (req, res) => {
         
         let data = await Promise.all(getsubcategory.map(async (el) => {
             el.category_image = el.sc_image
-            let count = await model.GetProductSubCategoryCount(el.category_id)
+            let count = await model.GetProductSubCategoryCount(el.sc_id)
             el.product_count = count.length
             return el
         }))
