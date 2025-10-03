@@ -24,6 +24,7 @@ module.exports.AddProducts = async (req, res) => {
         message: language.insufficient_parameters,
       });
     }
+
     let CheckProduct = await model.CheckProductQuery(product_name);
     if (CheckProduct.length > 0) {
       return res.send({
@@ -31,6 +32,7 @@ module.exports.AddProducts = async (req, res) => {
         message: language.product_already_exists,
       });
     }
+
     const checkCategory = await model.CheckCategory(category)
     if (checkCategory.length === 0) {
       return res.send({
@@ -38,6 +40,7 @@ module.exports.AddProducts = async (req, res) => {
         message: "Category not found"
       })
     }
+    
     let product_nameInArab = await translatte(product_name, { to: "ar" });
     product_nameInArab = product_nameInArab.text;
     let product_nameInFrench = await translatte(product_name, { to: "fr" });

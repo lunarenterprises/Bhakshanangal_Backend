@@ -72,6 +72,7 @@
     "banner_added_success": "banner added successfully",
     "image_upload_failed": "image uploaded failed ,pls check and try again",
     "Please_add_category_image_also": "Please add category image also",
+    "Please_add_image_also":"Please add Image",
     "product_or_category": "pick one of them product or category",
     "coupon_or_offer": "pick one of them coupon or offer",
     "product_coupon_added_successfully": "product coupon added successfully",
@@ -88,5 +89,6 @@
     "coupon_removed_successfully": "coupon removed successfully",
     "item_already_removed": "item already removed",
     "order_deleted_successfully": "Order deleted successfully",
-    "order_delete_failed": "Failed to delete order"
+    "order_delete_failed": "Failed to delete order",
+    "subcategory_added_success":"Sub Category added successfully"
 }

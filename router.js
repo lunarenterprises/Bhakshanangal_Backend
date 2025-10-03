@@ -42,6 +42,17 @@ route.post("/editproduct", EditProduct);
 route.post("/product/addvariant", AddProductVariants);
 route.post("/product/editvariant", EditProductVariant);
 
+var { AddCategory,AddSubCategory } = require("./controller/AddCategory");
+// route.post("/add-category", verifyToken, authorize('admin'), AddCategory)
+route.post("/add-category", verifyToken, AddCategory)
+route.post("/add-subcategory",verifyToken, AddSubCategory)
+
+
+var { CategoryList,SubCategoryList } = require('./controller/categorylist')
+route.post('/categorylist', CategoryList)
+route.post('/list/sub-category', SubCategoryList)
+
+
 var { ListAllProduct, ViewProduct } = require("./controller/ListProduct");
 route.post("/productlist", ListAllProduct);
 route.post('/viewproduct', ViewProduct)
@@ -67,9 +78,6 @@ route.post("/createorder", CreateOrder);
 var { AddAddresses } = require("./controller/AddAddress");
 // route.post("/addaddress", verifyToken, authorize('user'), AddAddresses);
 route.post("/addaddress", verifyToken, AddAddresses);
-
-var { CategoryList } = require('./controller/categorylist')
-route.post('/categorylist', CategoryList)
 
 
 // var {capturePayment} =  require('./controller/Capturepayment')
@@ -109,9 +117,7 @@ var { ListUser } = require("./controller/listuser");
 // route.post("/list-user", verifyToken, authorize('admin'), ListUser);
 route.post("/list-user", verifyToken, ListUser);
 
-var { AddCategory } = require("./controller/AddCategory");
-// route.post("/add-category", verifyToken, authorize('admin'), AddCategory)
-route.post("/add-category", verifyToken, AddCategory)
+
 
 var { ProductRating } = require('./controller/rating')
 // route.post("/product/rating", verifyToken, authorize('user'), ProductRating)

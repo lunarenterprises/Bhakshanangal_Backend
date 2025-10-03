@@ -5,7 +5,7 @@
   "main": "bhakshanangal.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "ap": "nodemon bhakshanangal.js"
+    "start": "nodemon bhakshanangal.js"
   },
   "keywords": [],
   "author": "",

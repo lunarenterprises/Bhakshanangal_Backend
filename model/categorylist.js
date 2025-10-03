@@ -14,7 +14,7 @@ module.exports.GetCategory = async (lang) => {
 inner join bh_product_categories on ct_c_id = category_id
 inner join bh_languages on ct_language_id = language_id
 where category_status = 'active' and language_code = ?`;
-    var data = query(Query,[lang]);
+    var data = query(Query, [lang]);
     return data;
 };
 
@@ -24,3 +24,17 @@ module.exports.GetProductCategoryCount = async (category_id) => {
     return data;
 };
 
+module.exports.GetSubCategory = async (category_id,lang) => {
+    var Query = `SELECT sc_id,sct_language_name as sc_name,sc_image,sc_status FROM bh_subcategory_translation
+                inner join bh_product_sub_categories on sct_c_id = sc_id
+                inner join bh_languages on sct_language_id = language_id
+                where sc_status = '1'and sc_category_id=? and language_code =?`;
+    var data = query(Query, [category_id,lang]);
+    return data;
+};
+
+module.exports.GetProductSubCategoryCount = async (category_id) => {
+    var Query = `select * from bh_products where sub_category_id = ?`;
+    var data = query(Query, [category_id]);
+    return data;
+};

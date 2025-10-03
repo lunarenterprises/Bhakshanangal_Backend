@@ -14,14 +14,33 @@ module.exports.Getcategory = async (category_name) => {
     return data;
 };
 
-module.exports.AddCategory = async (category_name, category_image) => {
-    var Query = `insert into bh_product_categories(category_name,category_image)values(?,?)`;
-    var data = query(Query, [category_name, category_image]);
+module.exports.AddCategory = async (category_name, category_image, status) => {
+    var Query = `insert into bh_product_categories(category_name,category_image,category_status)values(?,?,?)`;
+    var data = query(Query, [category_name, category_image, status]);
     return data;
 };
 
 module.exports.AddCategoryLang = async (category_id, lang_id, category_name) => {
     var Query = `insert into bh_category_translation(ct_c_id,ct_language_id,ct_language_name)values(?,?,?)`;
+    var data = query(Query, [category_id, lang_id, category_name]);
+    return data;
+};
+
+
+module.exports.Getcategorydata = async (category_id) => {
+    var Query = `select * from bh_product_categories where category_id = ? `;
+    var data = query(Query, [category_id]);
+    return data;
+};
+
+module.exports.AddSubCategory = async (category_id, category_name, imagepath, status) => {
+    var Query = `insert into bh_product_sub_categories(sc_category_id,sc_name,sc_image,sc_status)values(?,?,?,?)`;
+    var data = query(Query, [category_id, category_name, imagepath, status]);
+    return data;
+};
+
+module.exports.AddsubCategoryLang = async (category_id, lang_id, category_name) => {
+    var Query = `insert into bh_subcategory_translation(sct_c_id,sct_language_id,sct_language_name)values(?,?,?)`;
     var data = query(Query, [category_id, lang_id, category_name]);
     return data;
 };

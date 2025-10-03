@@ -16,18 +16,18 @@ module.exports.Login = async (req, res) => {
     let email = req.body.email;
     let app_version = req.body.app_version;
 
-    if (
-      !device_id ||
-      !device_os ||
-      !device_token ||
-      !password ||
-      !email
-    ) {
-      return res.send({
-        result: false,
-        message: language.insufficient_parameters,
-      });
-    }
+    // if (
+    //   !device_id ||
+    //   !device_os ||
+    //   !device_token ||
+    //   !password ||
+    //   !email
+    // ) {
+    //   return res.send({
+    //     result: false,
+    //     message: language.insufficient_parameters,
+    //   });
+    // }
     let CheckUser = await model.CheckUserQuery(email);
     if (CheckUser.length > 0) {
       if (CheckUser[0].user_email_verification == 'no') {
