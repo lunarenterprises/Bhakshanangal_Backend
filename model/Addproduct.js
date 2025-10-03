@@ -23,15 +23,17 @@ module.exports.CheckCategory = async (category_id) => {
 
 module.exports.AddProduct = async (
   category_id,
+  sub_category,material,how_to_use,tax_value_id,
   shipping,
   cash_on_delivery,
   refundable,
   free_delivery,
   new_arrival
 ) => {
-  var Query = `insert into bh_products(category_id,shipping,cash_on_delivery,refundable,free_delivery,new_arrival)values(?,?,?,?,?,?)`;
+  var Query = `insert into bh_products(category_id,sub_category_id,material,how_to_use,tax_value_id,shipping,cash_on_delivery,refundable,free_delivery,new_arrival)values(?,?,?,?,?,?,?,?,?,?)`;
   var data = query(Query, [
     category_id,
+    sub_category,material,how_to_use,tax_value_id,
     shipping,
     cash_on_delivery,
     refundable,

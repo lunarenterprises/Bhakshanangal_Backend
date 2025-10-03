@@ -10,7 +10,7 @@ var formidable = require("formidable");
 
 module.exports.AddProducts = async (req, res) => {
   try {
-    const { product_name, product_description, category, shipping = false, cod = false, refund = false, free_delivery = false, new_arrival = false, lang = 'en' } = req.body
+    const { product_name, product_description, category,sub_category,material,how_to_use,tax_value_id, shipping = false, cod = false, refund = false, free_delivery = false, new_arrival = false, lang = 'en' } = req.body
     const language = await languages(lang);
     console.log("Body",req.body);
     
@@ -40,7 +40,7 @@ module.exports.AddProducts = async (req, res) => {
         message: "Category not found"
       })
     }
-    
+
     let product_nameInArab = await translatte(product_name, { to: "ar" });
     product_nameInArab = product_nameInArab.text;
     let product_nameInFrench = await translatte(product_name, { to: "fr" });
@@ -105,6 +105,7 @@ module.exports.AddProducts = async (req, res) => {
 
     var Product_insert = await model.AddProduct(
       category,
+      sub_category,material,how_to_use,tax_value_id,
       shipping,
       cod,
       refund,
