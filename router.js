@@ -77,7 +77,6 @@ var { AddAddresses } = require("./controller/AddAddress");
 // route.post("/addaddress", verifyToken, authorize('user'), AddAddresses);
 route.post("/addaddress", verifyToken, AddAddresses);
 
-
 // var {capturePayment} =  require('./controller/Capturepayment')
 // route.get('/capture-payment',capturePayment)
 
@@ -293,5 +292,15 @@ route.post('/list/product-question-answer', ListProductQuestionAnswers)
 
 var { UpdateDeliveryDate } = require('./controller/UpdateDeliveryStatus')
 route.post('/update/delivery-status', UpdateDeliveryDate)
+
+var { AddUnit,listUnit,deleteUnit } = require('./controller/unit')
+route.post('/add/unit', AddUnit)
+route.post('/list/unit', listUnit)
+route.post('/delete/unit', deleteUnit)
+
+var { AddTax,listTax,deleteTax } = require('./controller/taxSchedule')
+route.post('/add/tax', AddTax)
+route.post('/list/tax', listTax)
+route.post('/delete/tax', deleteTax)
 
 module.exports = route;
