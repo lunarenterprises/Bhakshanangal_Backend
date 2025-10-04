@@ -79,14 +79,15 @@ module.exports.GetAllProducts = async ({category_id, sub_category_id = null, sea
     const offset = (page - 1) * limit;
 
     let Query = `
-        SELECT p.*, pc.*, psc.sc_id AS sub_category_id, psc.sc_name AS sub_category_name
+        SELECT p.*, pc.*,ts.*, psc.sc_id AS sub_category_id, psc.sc_name AS sub_category_name
         FROM bh_products p
         LEFT JOIN bh_product_categories pc 
                ON pc.category_id = p.category_id AND pc.category_status = 'active'
         LEFT JOIN bh_product_sub_categories psc 
                ON psc.sc_id = p.sub_category_id AND psc.sc_status = '1'
-        WHERE p.product_status = 'active'
-    `;
+        LEFT JOIN tax_schedule ts 
+               ON ts.tx_schedule_id  = p.tax_value_id 
+        WHERE p.product_status = 'active' `;
 
     const params = [];
 
@@ -154,6 +155,27 @@ module.exports.GetProductTranslation = async (product_id) => {
         WHERE t.product_id = ?
     `;
     return await query(Query, [product_id]);
+}
+
+module.exports.GetCategoryTranslation = async (category_id) => {
+    let Query = `
+        SELECT ct.*, l.language_name, l.language_code
+        FROM bh_category_translation ct
+        JOIN bh_languages l 
+          ON l.language_id = ct.ct_language_id
+        WHERE ct.ct_c_id = ? `;
+    return await query(Query, [category_id]);
+}
+
+module.exports.GetSubCategoryTranslation = async (sub_category_id) => {
+    let Query = `
+        SELECT sct.*, l.language_name, l.language_code
+        FROM bh_subcategory_translation sct
+        JOIN bh_languages l 
+          ON l.language_id = sct.sct_language_id
+        WHERE sct.sct_c_id = ?
+    `;
+    return await query(Query, [sub_category_id]);
 }
 
 module.exports.GetProductById = async (product_id) => {

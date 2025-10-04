@@ -5,12 +5,19 @@ module.exports.CategoryList = async (req, res) => {
     try {
         const lang = req.body.language || 'en';
         let { page = 1, limit = 20, search = '' } = req.body;
+        let { role } = req.user
 
         // Ensure page and limit are integers
         page = parseInt(page);
         limit = parseInt(limit);
 
         const offset = (page - 1) * limit;
+
+        let status = ''
+
+        if (role == 'user') {
+            status = `WHERE category_status = '1'`
+        }
 
         const language = await languages(lang);
 
@@ -21,7 +28,7 @@ module.exports.CategoryList = async (req, res) => {
         const totalPage = Math.ceil(categoryCount / limit);
 
         // Get paginated categories with search
-        const getCategory = await model.GetCategory(lang, offset, limit, search); // update model to accept search
+        const getCategory = await model.GetCategory(lang,status, offset, limit, search); // update model to accept search
 
         // Attach product count for each category
         const data = await Promise.all(getCategory.map(async (el) => {
@@ -61,10 +68,18 @@ module.exports.SubCategoryList = async (req, res) => {
     try {
         const lang = req.body.language || 'en';
         let { category_id, page = 1, limit = 20, search = '' } = req.body;
-
+        let { role } = req.user
         page = parseInt(page);
         limit = parseInt(limit);
         const offset = (page - 1) * limit;
+
+        console.log("rrrr", req.user);
+
+        let status = ''
+
+        if (role == 'user') {
+            status = `WHERE sc.sc_status = '1'`
+        }
 
         const language = await languages(lang);
 
@@ -74,7 +89,7 @@ module.exports.SubCategoryList = async (req, res) => {
         const totalPage = Math.ceil(totalCount / limit);
 
         // Get paginated subcategories with search
-        const getSubCategory = await model.GetSubCategory(lang, category_id, search, offset, limit); // Update model to accept pagination & search
+        const getSubCategory = await model.GetSubCategory(lang, status, category_id, search, offset, limit); // Update model to accept pagination & search
 
         // Attach product count for each subcategory
         const data = await Promise.all(getSubCategory.map(async (el) => {

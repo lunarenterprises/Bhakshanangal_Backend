@@ -8,7 +8,7 @@ module.exports.CheckUserQuery = async (user_id) => {
     return data;
 };
 
-module.exports.GetCategory = async (lang, offset, limit, search = '') => {
+module.exports.GetCategory = async (lang,status, offset, limit, search = '') => {
     let Query = `
         SELECT 
             category_id,
@@ -17,9 +17,8 @@ module.exports.GetCategory = async (lang, offset, limit, search = '') => {
             category_status
         FROM bh_category_translation
         INNER JOIN bh_product_categories ON ct_c_id = category_id
-        INNER JOIN bh_languages ON ct_language_id = language_id
-        WHERE category_status = 'active' 
-          AND language_code = ? `;
+        INNER JOIN bh_languages ON ct_language_id = language_id ${status} 
+        AND language_code = ? `;
 
     const params = [lang];
 
@@ -43,13 +42,14 @@ module.exports.GetProductCategoryCount = async (category_id) => {
     var data = query(Query, [category_id]);
     return data;
 };
+
 module.exports.GetCategoryCount = async () => {
     var Query = `select * from bh_product_categories`;
     var data = query(Query);
     return data;
 };
 
-module.exports.GetSubCategory = async (lang, category_id = null, search = '', offset , limit ) => {
+module.exports.GetSubCategory = async (lang,status, category_id = null, search = '', offset , limit ) => {
     let Query = `
         SELECT 
             sc.sc_id, 
@@ -62,7 +62,7 @@ module.exports.GetSubCategory = async (lang, category_id = null, search = '', of
         INNER JOIN bh_product_sub_categories sc ON sct.sct_c_id = sc.sc_id
         INNER JOIN bh_category_translation c ON sc.sc_category_id = c.ct_c_id AND c.ct_language_id = sct.sct_language_id
         INNER JOIN bh_languages l ON sct.sct_language_id = l.language_id
-        WHERE sc.sc_status = '1' AND l.language_code = ? `;
+        ${status} AND l.language_code = ? `;
     const params = [lang];
 
     // If category_id is provided, filter by it

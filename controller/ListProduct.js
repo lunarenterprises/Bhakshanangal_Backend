@@ -124,51 +124,78 @@ var { languages } = require("../languages/languageFunc");
 
 module.exports.ListAllProduct = async (req, res) => {
   try {
-    let { user_id } = req.user
+    let { user_id } = req.user;
+    const { category_id, sub_category_id, lang = "en", search, page = 1, limit = 10 } = req.body;
 
-    const { category_id,sub_category_id,lang = "en", search, page=1, limit=10 } = req.body
-    
-    const products = await model.GetAllProducts({category_id,sub_category_id, search, page, limit })
+    // Fetch all products
+    const products = await model.GetAllProducts({ category_id, sub_category_id, search, page, limit, lang });
+    // console.log("products", products);
+
     const productData = await Promise.all(products.map(async (product) => {
+      // ✅ Fetch product variants
+      const variants = await model.GetProductVariants(product?.product_id);
 
-      const variants = await model.GetProductVariants(product?.product_id)
-      const translations = await model.GetProductTranslation(product?.product_id)
+      // ✅ Fetch product translations
+      const translations = await model.GetProductTranslation(product?.product_id);
       const translationData = translations.find(item => item.language_code === lang);
-      let wishlistcheck = await model.Getwishlist(user_id, product.product_id)
-      
-      if (wishlistcheck.length > 0) {
-        var wishlist = true
-      } else {
-        var wishlist = false
+
+      // ✅ Wishlist check
+      const wishlistcheck = await model.Getwishlist(user_id, product.product_id);
+      const wishlist = wishlistcheck.length > 0;
+
+      // ✅ Default names (fallback from main table)
+      let categoryName = product.category_name;
+      let subcategoryName = product.sub_category_name;
+
+      // ✅ Fetch category & subcategory translations
+      if (product.category_id) {
+        const categoryTranslations = await model.GetCategoryTranslation(product.category_id);
+        const subcategoryTranslations = await model.GetSubCategoryTranslation(product.sub_category_id);
+console.log("subcategoryTranslations",subcategoryTranslations);
+
+        // ✅ Category translation
+        const categoryTranslationData = categoryTranslations.find(item => item.language_code === lang);
+        if (categoryTranslationData?.ct_language_name) {
+          categoryName = categoryTranslationData.ct_language_name;
+        }
+
+        // ✅ Sub-category translation
+        const subcategoryTranslationData = subcategoryTranslations.find(item => item.language_code === lang);
+        if (subcategoryTranslationData?.sct_language_name) {
+          subcategoryName = subcategoryTranslationData.sct_language_name;
+        }
       }
 
       return {
         ...product,
-        product_name: translationData?.product_name,
-        description: translationData?.description,
-        wishlist: wishlist,
-
+        category_name: categoryName,
+        sub_category_name: subcategoryName,
+        product_name: translationData?.product_name || product.product_name,
+        description: translationData?.description || product.description,
+        material: translationData?.material || product.material,
+        how_to_use: translationData?.how_to_use || product.how_to_use,
+        wishlist,
         variants: variants.map((variant) => ({
           ...variant,
-          images: JSON.parse(variant.images)
+          images: JSON.parse(variant.images),
         }))
-      }
-
-    }))
+      };
+    }));
 
     return res.send({
       result: true,
-      message: "Data retreived successfully",
+      message: "Data retrieved successfully",
       data: productData
-    })
+    });
 
   } catch (error) {
+    console.error("ListAllProduct Error:", error);
     return res.send({
       result: false,
       message: error.message
-    })
+    });
   }
-}
+};
 
 
 module.exports.ViewProduct = async (req, res) => {
