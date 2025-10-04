@@ -143,7 +143,6 @@ module.exports.GetProductTranslation = async (product_id) => {
     return await query(Query, [product_id]);
 }
 
-
 module.exports.GetProductById = async (product_id) => {
     let Query = `SELECT p.*, pc.*
         FROM bh_products p

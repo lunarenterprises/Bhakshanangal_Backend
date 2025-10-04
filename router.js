@@ -47,14 +47,12 @@ var { AddCategory,AddSubCategory } = require("./controller/AddCategory");
 route.post("/add-category", verifyToken, AddCategory)
 route.post("/add-subcategory",verifyToken, AddSubCategory)
 
-
 var { CategoryList,SubCategoryList } = require('./controller/categorylist')
 route.post('/categorylist', CategoryList)
 route.post('/list/sub-category', SubCategoryList)
 
-
 var { ListAllProduct, ViewProduct } = require("./controller/ListProduct");
-route.post("/productlist", ListAllProduct);
+route.post("/productlist",verifyToken, ListAllProduct);
 route.post('/viewproduct', ViewProduct)
 
 var { ViewProducts } = require("./controller/viewProduct");

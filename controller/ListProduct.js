@@ -124,16 +124,30 @@ var { languages } = require("../languages/languageFunc");
 
 module.exports.ListAllProduct = async (req, res) => {
   try {
+    let { user_id } = req.user
+    console.log(req.user);
+
     const { lang = "en", search, filterBy, page, limit } = req.body
+    
     const products = await model.GetAllProducts({ search, page, limit })
     const productData = await Promise.all(products.map(async (product) => {
+
       const variants = await model.GetProductVariants(product?.product_id)
       const translations = await model.GetProductTranslation(product?.product_id)
       const translationData = translations.find(item => item.language_code === lang);
+      let wishlistcheck = await model.Getwishlist(user_id, product.product_id)
+      
+      if (wishlistcheck.length > 0) {
+        var wishlist = true
+      } else {
+        var wishlist = false
+      }
       return {
         ...product,
         product_name: translationData?.product_name,
         description: translationData?.description,
+        wishlist: wishlist,
+
         variants: variants.map((variant) => ({
           ...variant,
           images: JSON.parse(variant.images)
@@ -156,7 +170,7 @@ module.exports.ListAllProduct = async (req, res) => {
 
 module.exports.ViewProduct = async (req, res) => {
   try {
-    const { product_id, lang='en' } = req.body
+    const { product_id, lang = 'en' } = req.body
     if (!product_id) {
       return res.send({
         result: false,
