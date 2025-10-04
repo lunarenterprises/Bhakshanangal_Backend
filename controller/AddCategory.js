@@ -67,7 +67,7 @@ module.exports.AddCategory = async (req, res) => {
       }
 
       // Add category to DB
-      const addCategory = await model.AddCategory(category_name, imagePath,status);
+      const addCategory = await model.AddCategory(category_name, imagePath, status);
       const categoryId = addCategory.insertId;
 
       // Translate category name
@@ -124,12 +124,11 @@ module.exports.AddSubCategory = async (req, res) => {
         });
       }
 
-     let { category_id, category_name, status, language: lang = 'en' } = fields;
+      let { category_id, category_name, status, language: lang = 'en' } = fields;
 
       const { user_id, role } = req?.user || {};
 
       const language = await languages(lang);
-console.log("language",language);
 
       if (!category_name || !category_id || !status) {
         return res.send({
@@ -145,11 +144,20 @@ console.log("language",language);
         });
       }
 
-      const checkCategory = await model.Getcategorydata(category_id);
-      if (checkCategory.length > 0) {
+      const checkSubCategory = await model.GetSubcategoryname(category_name);
+
+      if (checkSubCategory.length > 0) {
         return res.send({
           result: false,
-          message: language.category_already_exist,
+          message: "This sub category alredy exist",
+        });
+      }
+
+      const checkCategory = await model.Getcategorydata(category_id);
+      if (checkCategory.length == 0) {
+        return res.send({
+          result: false,
+          message: "Category not found",
         });
       }
 

@@ -75,23 +75,35 @@ module.exports.GetImages = async (product_id) => {
 //     return data;
 // }
 
-module.exports.GetAllProducts = async ({ search = '', page = 1, limit = 10 }) => {
+module.exports.GetAllProducts = async ({category_id, sub_category_id = null, search = '', page = 1, limit = 10 }) => {
     const offset = (page - 1) * limit;
 
     let Query = `
-        SELECT p.*, pc.*
+        SELECT p.*, pc.*, psc.sc_id AS sub_category_id, psc.sc_name AS sub_category_name
         FROM bh_products p
         LEFT JOIN bh_product_categories pc 
                ON pc.category_id = p.category_id AND pc.category_status = 'active'
+        LEFT JOIN bh_product_sub_categories psc 
+               ON psc.sc_id = p.sub_category_id AND psc.sc_status = '1'
         WHERE p.product_status = 'active'
     `;
 
     const params = [];
 
+   if (category_id) {
+        Query += ` AND p.category_id = ?`;
+        params.push(category_id);
+    }
+
+    if (sub_category_id) {
+        Query += ` AND p.sub_category_id = ?`;
+        params.push(sub_category_id);
+    }
+
     // Add search filter if provided
-    if (search) {
-        Query += ` AND (p.product_name LIKE ? OR pc.category_name LIKE ?)`;
-        params.push(`%${search}%`, `%${search}%`);
+    if (search && search.trim() !== '') {
+        Query += ` AND (p.product_name LIKE ? OR pc.category_name LIKE ? OR psc.sc_name LIKE ?)`;
+        params.push(`%${search}%`, `%${search}%`, `%${search}%`);
     }
 
     // Order by latest created
@@ -102,7 +114,8 @@ module.exports.GetAllProducts = async ({ search = '', page = 1, limit = 10 }) =>
     params.push(Number(limit), Number(offset));
 
     return await query(Query, params);
-}
+};
+
 
 
 

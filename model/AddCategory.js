@@ -26,10 +26,19 @@ module.exports.AddCategoryLang = async (category_id, lang_id, category_name) => 
     return data;
 };
 
-
 module.exports.Getcategorydata = async (category_id) => {
     var Query = `select * from bh_product_categories where category_id = ? `;
     var data = query(Query, [category_id]);
+    return data;
+};
+
+module.exports.GetSubcategoryname = async (category_name) => {
+    const Query = `
+        SELECT *
+        FROM bh_product_sub_categories
+        WHERE LOWER(sc_name) = ? `;
+
+    const data = await query(Query, [category_name.toLowerCase()]);
     return data;
 };
 

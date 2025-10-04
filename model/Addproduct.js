@@ -21,19 +21,24 @@ module.exports.CheckCategory = async (category_id) => {
   return await query(Query, [category_id])
 }
 
+module.exports.CheckSubCategory = async (sub_category) => {
+  let Query = `select * from bh_product_sub_categories where sc_id=?`
+  return await query(Query, [sub_category])
+}
+
 module.exports.AddProduct = async (
   category_id,
-  sub_category,material,how_to_use,tax_value_id,
+  sub_category, tax_value_id,
   shipping,
   cash_on_delivery,
   refundable,
   free_delivery,
   new_arrival
 ) => {
-  var Query = `insert into bh_products(category_id,sub_category_id,material,how_to_use,tax_value_id,shipping,cash_on_delivery,refundable,free_delivery,new_arrival)values(?,?,?,?,?,?,?,?,?,?)`;
+  var Query = `insert into bh_products(category_id,sub_category_id,tax_value_id,shipping,cash_on_delivery,refundable,free_delivery,new_arrival)values(?,?,?,?,?,?,?,?)`;
   var data = query(Query, [
     category_id,
-    sub_category,material,how_to_use,tax_value_id,
+    sub_category, tax_value_id,
     shipping,
     cash_on_delivery,
     refundable,
@@ -77,18 +82,19 @@ module.exports.AddTranslatedProducts = async (
   product_id,
   language_id,
   product_name,
-  description
+  description,
+  material, how_to_use
 ) => {
-  var Query = `insert into bh_product_translations(product_id,language_id,product_name,description)values(?,?,?,?)`;
+  var Query = `insert into bh_product_translations(product_id,language_id,product_name,description,material,how_to_use)values(?,?,?,?,?,?)`;
   var data = query(Query, [
     product_id,
     language_id,
     product_name,
     description,
+    material, how_to_use
   ]);
   return data;
 };
-
 
 module.exports.CheckProductWithId = async (product_id) => {
   let Query = `select * from bh_products where product_id=?`

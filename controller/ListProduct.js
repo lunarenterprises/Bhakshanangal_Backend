@@ -125,11 +125,10 @@ var { languages } = require("../languages/languageFunc");
 module.exports.ListAllProduct = async (req, res) => {
   try {
     let { user_id } = req.user
-    console.log(req.user);
 
-    const { lang = "en", search, filterBy, page, limit } = req.body
+    const { category_id,sub_category_id,lang = "en", search, page=1, limit=10 } = req.body
     
-    const products = await model.GetAllProducts({ search, page, limit })
+    const products = await model.GetAllProducts({category_id,sub_category_id, search, page, limit })
     const productData = await Promise.all(products.map(async (product) => {
 
       const variants = await model.GetProductVariants(product?.product_id)
@@ -142,6 +141,7 @@ module.exports.ListAllProduct = async (req, res) => {
       } else {
         var wishlist = false
       }
+
       return {
         ...product,
         product_name: translationData?.product_name,
@@ -153,12 +153,15 @@ module.exports.ListAllProduct = async (req, res) => {
           images: JSON.parse(variant.images)
         }))
       }
+
     }))
+
     return res.send({
       result: true,
       message: "Data retreived successfully",
       data: productData
     })
+
   } catch (error) {
     return res.send({
       result: false,
