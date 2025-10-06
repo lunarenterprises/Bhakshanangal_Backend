@@ -106,9 +106,9 @@ module.exports.CheckProductWithId = async (product_id) => {
   return await query(Query, [product_id])
 }
 
-module.exports.AddProductVariant = async (product_id, size, unit, stock, price, discount) => {
-  let Query = `insert into bh_product_variants (bpv_product_id,bpv_size,bpv_unit,bpv_stock,bpv_price,bpv_discount) values(?,?,?,?,?,?)`
-  return await query(Query, [product_id, size, unit, stock, price, discount])
+module.exports.AddProductVariant = async (product_id,sku, size, unit, stock, price, discount) => {
+  let Query = `insert into bh_product_variants (bpv_product_id,bpv_sku,bpv_size,bpv_unit,bpv_stock,bpv_price,bpv_discount) values(?,?,?,?,?,?,?)`
+  return await query(Query, [product_id,sku, size, unit, stock, price, discount])
 }
 
 module.exports.UpdateProductVariant = async (updateString, variant_id) => {
@@ -150,4 +150,16 @@ module.exports.CheckProductVariant = async (variant_id) => {
 module.exports.GetProductVariantImages = async (variant_id) => {
   let Query = `select * from bh_product_variant_images where pv_variant_id=?`
   return await query(Query, [variant_id])
+}
+
+module.exports.DeleteFilesQuery = async (user_id, fileKeys) => {
+    var Query = `delete from bh_product_variant_images where pv_variant_id =? and pv_id not in (${fileKeys})`;
+    var data = await query(Query, [user_id, fileKeys]);
+    return data;
+}
+
+module.exports.DeleteAllUserFilesQuery = async (variant_id) => {
+  var Query = `delete from bh_product_variant_images where pv_variant_id=? `;
+  var data = await query(Query, [variant_id]);
+  return data;
 }

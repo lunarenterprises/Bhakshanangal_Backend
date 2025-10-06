@@ -32,7 +32,7 @@ const verifyToken = (req, res, next) => {
 }
 
 // Authorization middleware (Role-based)
-const authorize = (allowedRoles = []) => {
+const authorize = (allowedRoles = ['admin','user']) => {
     return (req, res, next) => {
         const user = req.user;
 

@@ -2,16 +2,24 @@ let model = require('../model/productQuestion')
 
 module.exports.AddProductQuestion = async (req, res) => {
     try {
-        let { pq_p_id, pq_u_id, pq_question } = req.body
+        let { role } = req.user
+        let { pq_p_id, pq_u_id, pq_question, pq_answer } = req.body
 
-        if (!pq_p_id || !pq_u_id || !pq_question) {
+        if (!pq_p_id || !pq_question) {
             return res.send({
                 result: false,
                 message: "please fill all the fileds"
             })
         }
+        let addproductquestion
 
-        let addproductquestion = await model.AddProductQuestion(pq_p_id, pq_u_id, pq_question)
+        if (role == 'admin') {
+            addproductquestion = await model.AddProductQuestion(pq_p_id, pq_u_id, pq_question, pq_answer)
+
+        } else {
+            addproductquestion = await model.AddProductQuestion(pq_p_id, pq_u_id, pq_question)
+
+        }
 
         if (addproductquestion.affectedRows > 0) {
             return res.send({
@@ -61,12 +69,14 @@ module.exports.AddProductQuestionAnswer = async (req, res) => {
 
 module.exports.ListProductQuestionAnswers = async (req, res) => {
     try {
-        let { pq_p_id, role } = req.body
+        let { pq_p_id } = req.body
+        let { role } = req.user
         let condition = ''
-        if (role) {
+        if (role == 'user') {
             condition = `and pq_answer <>'NULL'`
 
         }
+        
         let QuestionAnswerslist = await model.ListProductQuestionAnswersQuery(pq_p_id, condition);
 
         if (QuestionAnswerslist.length > 0) {

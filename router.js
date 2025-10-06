@@ -35,12 +35,10 @@ var { RemoveAddress } = require("./controller/removeAddress");
 route.post("/remove-address", verifyToken, RemoveAddress);
 
 var { AddProducts, AddProductVariants, EditProduct, EditProductVariant } = require("./controller/Addproduct");
-// route.post("/addproduct", verifyToken, authorize('admin'), AddProducts);
-route.post("/add/product", AddProducts);
-// route.post("/product/addvariant", verifyToken, authorize('admin'),AddProductVariants);
-route.post("/editproduct", EditProduct);
-route.post("/product/addvariant", AddProductVariants);
-route.post("/product/editvariant", EditProductVariant);
+route.post("/addproduct", verifyToken, authorize('admin'), AddProducts);
+route.post("/product/addvariant", verifyToken, authorize('admin'),AddProductVariants);
+route.post("/editproduct",verifyToken, EditProduct);
+route.post("/product/editvariant",verifyToken, EditProductVariant);
 
 var { AddCategory,EditCategory,AddSubCategory,EditSubCategory } = require("./controller/AddCategory");
 // route.post("/add-category", verifyToken, authorize('admin'), AddCategory)
@@ -284,13 +282,13 @@ var { orderListDownload } = require('./controller/orderlistDownload')
 route.post('/download/order-list', orderListDownload)
 
 var { AddProductQuestion } = require('./controller/productQuestion')
-route.post('/add/product-question', AddProductQuestion)
+route.post('/add/product-question',verifyToken, AddProductQuestion)
 
 var { AddProductQuestionAnswer } = require('./controller/productQuestion')
-route.post('/add/product-answer', AddProductQuestionAnswer)
+route.post('/add/product-answer',verifyToken, AddProductQuestionAnswer)
 
 var { ListProductQuestionAnswers } = require('./controller/productQuestion')
-route.post('/list/product-question-answer', ListProductQuestionAnswers)
+route.post('/list/product-question-answer',verifyToken, ListProductQuestionAnswers)
 
 var { UpdateDeliveryDate } = require('./controller/UpdateDeliveryStatus')
 route.post('/update/delivery-status', UpdateDeliveryDate)

@@ -58,7 +58,7 @@ module.exports.AddProducts = async (req, res) => {
       });
     }
 
-        const checkTax = await model.CheckTax(tax_value_id);
+    const checkTax = await model.CheckTax(tax_value_id);
     if (checkTax.length === 0) {
       return res.send({
         result: false,
@@ -152,79 +152,98 @@ module.exports.AddProducts = async (req, res) => {
 
 module.exports.AddProductVariants = async (req, res) => {
   try {
-    var form = new formidable.IncomingForm({ multiples: true });
-    form.parse(req, async function (err, fields, files) {
+    const form = new formidable.IncomingForm({ multiples: true });
+
+    form.parse(req, async (err, fields, files) => {
       if (err) {
         return res.send({
-          success: false,
-          message: "File Upload Failed!",
+          result: false,
+          message: "File upload failed!",
           data: err,
         });
       }
-      const { product_id, size, unit, stock, price, discount, lang = 'en' } = fields
-      const language = await languages(lang);
-      if (!product_id || !size || !unit || !stock || !price || !discount) {
+
+      const {
+        product_id,
+        sku,
+        size,
+        unit,
+        stock,
+        price,
+        discount,
+        lang = "en",
+      } = fields;
+
+      // 1️⃣ Validation
+      if (!product_id || !sku || !size || !unit || !stock || !price || !discount) {
         return res.send({
           result: false,
-          message: "Product id, size, unit, stock, price and discount are required"
-        })
+          message: "Product ID, SKU, size, unit, stock, price, and discount are required",
+        });
       }
 
-      if (!files?.images || files?.images?.length === 0) {
+      if (!files?.image) {
         return res.send({
           result: false,
-          message: "Images is required"
-        })
+          message: "At least one image is required",
+        });
       }
 
-      const checkProduct = await model.CheckProductWithId(product_id)
+      // 2️⃣ Check if product exists
+      const checkProduct = await model.CheckProductWithId(product_id);
       if (checkProduct.length === 0) {
         return res.send({
           result: false,
-          message: "Product not found."
-        })
+          message: "Product not found",
+        });
       }
-      const created = await model.AddProductVariant(product_id, size, unit, stock, price, discount)
-      if (created.affectedRows > 0) {
-        let imageArray = Array.isArray(files.images) ? files.images : [files.images];
-        const uploadDir = path.join(process.cwd(), "uploads", "product");
-        // Ensure the upload directory exists
-        if (!fs.existsSync(uploadDir)) {
-          fs.mkdirSync(uploadDir, { recursive: true });
-        }
 
-        for (let image of imageArray) {
-          const oldPath = image.filepath
-          const newPath = path.join(uploadDir, image.originalFilename);
-
-          try {
-            const rawData = fs.readFileSync(oldPath);
-            fs.writeFileSync(newPath, rawData); // ✅ synchronous write
-            const imagePath = "/uploads/product/" + image.originalFilename
-            await model.AddVariantImages(created.insertId, imagePath)
-          } catch (err) {
-            console.error("File save error:", err);
-          }
-        }
-        res.send({
-          result: true,
-          message: "Product variant added successfully"
-        })
-      } else {
+      // 3️⃣ Add product variant
+      const created = await model.AddProductVariant(product_id, sku, size, unit, stock, price, discount);
+      if (created.affectedRows === 0) {
         return res.send({
           result: false,
-          message: "Failed to add product variant. Please try again later"
-        })
+          message: "Failed to add product variant. Please try again later",
+        });
       }
-    })
 
+      const variantId = created.insertId;
+      const imageArray = Array.isArray(files.image) ? files.image : [files.image];
+      const uploadDir = path.join(process.cwd(), "uploads", "product");
+
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+      }
+
+      // 4️⃣ Save images
+      for (let image of imageArray) {
+        const oldPath = image.filepath;
+        const newPath = path.join(uploadDir, image.originalFilename);
+
+        try {
+          const rawData = fs.readFileSync(oldPath);
+          fs.writeFileSync(newPath, rawData);
+          const imagePath = "/uploads/product/" + image.originalFilename;
+          await model.AddVariantImages(variantId, imagePath);
+        } catch (err) {
+          console.error("File save error:", err);
+        }
+      }
+
+      // 5️⃣ Response
+      return res.send({
+        result: true,
+        message: "Product variant added successfully",
+      });
+    });
   } catch (error) {
     return res.send({
       result: false,
-      message: error.message
-    })
+      message: error.message || "An error occurred while adding product variant",
+    });
   }
-}
+};
+
 
 
 module.exports.EditProduct = async (req, res) => {
@@ -353,85 +372,113 @@ module.exports.EditProduct = async (req, res) => {
   }
 }
 
-
 module.exports.EditProductVariant = async (req, res) => {
   try {
     const form = new formidable.IncomingForm({ multiples: true });
-    form.parse(req, async function (err, fields, files) {
+
+    form.parse(req, async (err, fields, files) => {
       if (err) {
         return res.send({
-          success: false,
-          message: "File Upload Failed!",
+          result: false,
+          message: "File upload failed!",
           data: err,
         });
       }
-      const { product_variant_id, size, unit, stock, price, discount, lang = 'en' } = fields
+
+      const {
+        product_variant_id,
+        sku,
+        size,
+        unit,
+        stock,
+        price,
+        discount,
+        lang = "en",
+      } = fields;
+
       const language = await languages(lang);
+
+      // 1️⃣ Validation
       if (!product_variant_id) {
         return res.send({
           result: false,
-          message: "Product variant id is required"
-        })
+          message: "Product variant ID is required",
+        });
       }
-      const checkProductVariant = await model.CheckProductVariant(product_variant_id)
+
+      // 2️⃣ Check if variant exists
+      const checkProductVariant = await model.CheckProductVariant(product_variant_id);
       if (checkProductVariant.length === 0) {
         return res.send({
           result: false,
-          message: "Product variant not found."
-        })
-      }
-      const variantImages = await model.GetProductVariantImages(product_variant_id)
-      if (variantImages.length === 0 && (!files?.images || files?.images?.length === 0)) {
-        return res.send({
-          result: false,
-          message: "Images is required"
-        })
-      }
-      let imageArray = Array.isArray(files.images) ? files.images : [files.images];
-      const uploadDir = path.join(process.cwd(), "uploads", "product");
-      // Ensure the upload directory exists
-      if (!fs.existsSync(uploadDir)) {
-        fs.mkdirSync(uploadDir, { recursive: true });
+          message: "Product variant not found",
+        });
       }
 
-      for (let image of imageArray) {
-        const oldPath = image.filepath
-        const newPath = path.join(uploadDir, image.originalFilename);
-
-        try {
-          const rawData = fs.readFileSync(oldPath);
-          fs.writeFileSync(newPath, rawData); // ✅ synchronous write
-          const imagePath = "/uploads/product/" + image.originalFilename
-          await model.AddVariantImages(created.insertId, imagePath)
-        } catch (err) {
-          console.error("File save error:", err);
+      // 3️⃣ Handle file deletions if needed
+      if (files) {
+        const fileKeys = Object.keys(files).filter((key) => key !== "image");
+        if (fileKeys.length > 0) {
+          await model.DeleteFilesQuery(product_variant_id, fileKeys);
+        } else {
+          await model.DeleteAllUserFilesQuery(product_variant_id);
         }
       }
+
+      // 4️⃣ Handle image uploads
+      if (files.image) {
+        const imageArray = Array.isArray(files.image) ? files.image : [files.image];
+        const uploadDir = path.join(process.cwd(), "uploads", "product");
+
+        if (!fs.existsSync(uploadDir)) {
+          fs.mkdirSync(uploadDir, { recursive: true });
+        }
+
+        for (let image of imageArray) {
+          const oldPath = image.filepath;
+          const newPath = path.join(uploadDir, image.originalFilename);
+
+          try {
+            const rawData = fs.readFileSync(oldPath);
+            fs.writeFileSync(newPath, rawData);
+            const imagePath = "/uploads/product/" + image.originalFilename;
+            await model.AddVariantImages(product_variant_id, imagePath);
+          } catch (err) {
+            console.error("File save error:", err);
+          }
+        }
+      }
+
+      // 5️⃣ Update product variant fields dynamically
       let updates = [];
+      if (sku !== undefined) updates.push(`bpv_sku='${sku}'`);
       if (size !== undefined) updates.push(`bpv_size='${size}'`);
       if (unit !== undefined) updates.push(`bpv_unit='${unit}'`);
       if (stock !== undefined) updates.push(`bpv_stock='${stock}'`);
       if (price !== undefined) updates.push(`bpv_price='${price}'`);
       if (discount !== undefined) updates.push(`bpv_discount='${discount}'`);
+
       if (updates.length > 0) {
-        const updateString = updates.join(', ');
-        let updated = await model.UpdateProduct(updateString, product_variant_id);
+        const updateString = updates.join(", ");
+        const updated = await model.UpdateProductVariant(updateString, product_variant_id);
+
         if (updated.affectedRows === 0) {
           return res.send({
             result: false,
-            message: "Failed to update product variant"
-          })
+            message: "Failed to update product variant",
+          });
         }
       }
+
       return res.send({
         result: true,
-        message: "Product updated successfully"
-      })
-    })
+        message: "Product variant updated successfully",
+      });
+    });
   } catch (error) {
     return res.send({
       result: false,
-      message: error.message
-    })
+      message: error.message || "An error occurred",
+    });
   }
-}
+};
