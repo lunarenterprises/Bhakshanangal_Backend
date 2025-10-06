@@ -112,6 +112,8 @@ module.exports.AddProducts = async (req, res) => {
       return res.send({
         result: true,
         message: language.product_added_success,
+        product_id:Product_insert.insertId,
+        product_name:product_name
       });
     } else {
       return res.send({

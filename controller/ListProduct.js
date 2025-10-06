@@ -125,11 +125,13 @@ var { languages } = require("../languages/languageFunc");
 module.exports.ListAllProduct = async (req, res) => {
   try {
     let { user_id } = req.user;
-    const { category_id, sub_category_id, lang = "en", search, page = 1, limit = 10 } = req.body;
+    const { category_id, sub_category_id, lang = "en", search, page = 1, limit = 20 } = req.body;
 
     // Fetch all products
     const products = await model.GetAllProducts({ category_id, sub_category_id, search, page, limit, lang });
     // console.log("products", products);
+    const productsCount = products.length;
+    const totalPage = Math.ceil(productsCount / limit);
 
     const productData = await Promise.all(products.map(async (product) => {
       // ✅ Fetch product variants
@@ -151,7 +153,6 @@ module.exports.ListAllProduct = async (req, res) => {
       if (product.category_id) {
         const categoryTranslations = await model.GetCategoryTranslation(product.category_id);
         const subcategoryTranslations = await model.GetSubCategoryTranslation(product.sub_category_id);
-console.log("subcategoryTranslations",subcategoryTranslations);
 
         // ✅ Category translation
         const categoryTranslationData = categoryTranslations.find(item => item.language_code === lang);
@@ -185,6 +186,9 @@ console.log("subcategoryTranslations",subcategoryTranslations);
     return res.send({
       result: true,
       message: "Data retrieved successfully",
+      page,
+      limit,
+      totalPage,
       data: productData
     });
 

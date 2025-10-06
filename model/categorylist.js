@@ -49,43 +49,61 @@ module.exports.GetCategoryCount = async () => {
     return data;
 };
 
-module.exports.GetSubCategory = async (lang,status, category_id = null, search = '', offset , limit ) => {
+module.exports.GetSubCategory = async (lang, statusCondition = '', category_id = null, search = '', offset = 0, limit = 10) => {
+  try {
     let Query = `
-        SELECT 
-            sc.sc_id, 
-            sc.sc_category_id,
-            sct.sct_language_name AS sc_name, 
-            sc.sc_image, 
-            sc.sc_status, 
-            c.ct_language_name AS category_name
-        FROM bh_subcategory_translation sct
-        INNER JOIN bh_product_sub_categories sc ON sct.sct_c_id = sc.sc_id
-        INNER JOIN bh_category_translation c ON sc.sc_category_id = c.ct_c_id AND c.ct_language_id = sct.sct_language_id
-        INNER JOIN bh_languages l ON sct.sct_language_id = l.language_id
-        ${status} AND l.language_code = ? `;
+      SELECT 
+          sc.sc_id, 
+          sc.sc_category_id,
+          sct.sct_language_name AS sc_name, 
+          sc.sc_image, 
+          sc.sc_status, 
+          c.ct_language_name AS category_name
+      FROM bh_subcategory_translation sct
+      INNER JOIN bh_product_sub_categories sc 
+          ON sct.sct_c_id = sc.sc_id
+      INNER JOIN bh_category_translation c 
+          ON sc.sc_category_id = c.ct_c_id 
+         AND c.ct_language_id = sct.sct_language_id
+      INNER JOIN bh_languages l 
+          ON sct.sct_language_id = l.language_id
+      WHERE 1=1
+    `;
+
     const params = [lang];
 
-    // If category_id is provided, filter by it
-    if (category_id) {
-        Query += ` AND sc.sc_category_id = ?`;
-        params.push(category_id);
-    }
-    
-    // Else, if search is provided, filter by category name
-    else if (search && search.trim() !== '') {
-        Query += ` AND sct.sct_language_name LIKE ?`;
-        params.push(`%${search}%`);
+    // Status condition (make sure this is safe, predefined)
+    if (statusCondition) {
+      Query += ` AND ${statusCondition}`;
     }
 
-    // Add pagination if limit > 0
+    // Language filter
+    Query += ` AND l.language_code = ?`;
+
+    // Filter by category_id if provided
+    if (category_id) {
+      Query += ` AND sc.sc_category_id = ?`;
+      params.push(category_id);
+    }
+
+    // Filter by search if provided (applies under category if category_id is passed)
+    if (search && search.trim() !== '') {
+      Query += ` AND sct.sct_language_name LIKE ?`;
+      params.push(`%${search}%`);
+    }
+
+    // Pagination
     if (limit > 0) {
-        Query += ` LIMIT ? OFFSET ?`;
-        params.push(limit, offset);
+      Query += ` LIMIT ? OFFSET ?`;
+      params.push(limit, offset);
     }
 
     const data = await query(Query, params);
-
     return data;
+
+  } catch (error) {
+    throw new Error(error.message);
+  }
 };
 
 
