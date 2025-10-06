@@ -57,6 +57,14 @@ module.exports.AddProducts = async (req, res) => {
         message: "Sub category not found",
       });
     }
+
+        const checkTax = await model.CheckTax(tax_value_id);
+    if (checkTax.length === 0) {
+      return res.send({
+        result: false,
+        message: "Tax details not found",
+      });
+    }
     // Helper function to translate text into multiple languages
     const translateText = async (text) => {
       const ar = await translatte(text, { to: "ar" });
@@ -112,8 +120,19 @@ module.exports.AddProducts = async (req, res) => {
       return res.send({
         result: true,
         message: language.product_added_success,
-        product_id:Product_insert.insertId,
-        product_name:product_name
+        product_id: Product_insert.insertId,
+        product_name: product_name,
+        category_id: category,
+        category_name: checkCategory[0]?.category_name,
+        sub_category_id: sub_category,
+        category_name: checkSubCategory[0]?.sc_name,
+        tx_schedule_id: checkTax[0]?.tx_schedule_id,
+        tx_schedule_name: checkTax[0]?.tx_schedule_name,
+        tx_schedule_tax: checkTax[0]?.tx_schedule_tax,
+        tx_schedule_cgst: checkTax[0]?.tx_schedule_cgst,
+        tx_schedule_igst: checkTax[0]?.tx_schedule_igst,
+        tx_schedule_sgst: checkTax[0]?.tx_schedule_sgst,
+        tx_schedule_vat: checkTax[0]?.tx_schedule_vat,
       });
     } else {
       return res.send({

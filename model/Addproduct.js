@@ -26,6 +26,11 @@ module.exports.CheckSubCategory = async (sub_category) => {
   return await query(Query, [sub_category])
 }
 
+module.exports.CheckTax = async (tax_value_id) => {
+  let Query = `select * from tax_schedule where tx_schedule_id=?`
+  return await query(Query, [tax_value_id])
+}
+
 module.exports.AddProduct = async (
   category_id,
   sub_category, tax_value_id,

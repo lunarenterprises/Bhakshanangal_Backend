@@ -49,7 +49,6 @@ route.post("/edit-category", verifyToken, EditCategory)
 route.post("/add-subcategory",verifyToken, AddSubCategory)
 route.post("/edit-subcategory",verifyToken, EditSubCategory)
 
-
 var { CategoryList,SubCategoryList } = require('./controller/categorylist')
 route.post('/categorylist',verifyToken, CategoryList)
 route.post('/list/sub-category',verifyToken, SubCategoryList)
@@ -271,8 +270,9 @@ route.post('/update/delivery-status', UpdateDeliveryStatus)
 var { UpdatePaymentStatus } = require('./controller/UpdatePaymentStatus')
 route.post('/update/order-status', UpdatePaymentStatus)
 
-var { DeleteCategory } = require('./controller/DeleteCategory')
-route.post('/delete-category', DeleteCategory)
+var { DeleteCategory,DeleteSubCategory } = require('./controller/DeleteCategory')
+route.post('/delete-category',verifyToken, DeleteCategory)
+route.post('/delete-subcategory',verifyToken, DeleteSubCategory)
 
 var { CreateContactUs } = require('./controller/ContactUs')
 route.post('/contactus', CreateContactUs)

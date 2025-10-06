@@ -2,26 +2,57 @@ var db = require("../db/db");
 var util = require("util");
 const query = util.promisify(db.query).bind(db);
 
-module.exports.DeleteCategory = async (category_id) => {
-    try {
-        let categoryItems = `select * from bh_products where category_id=?`
-        let products = await query(categoryItems, [category_id])
-        if (products.length > 0) {
-            let productQuery = `DELETE FROM bh_products WHERE category_id = ? AND product_status = 'removed'`;
-            let productData = await query(productQuery, [category_id]);
-            if (productData.affectedRows === 0) {
-                throw new Error("Failed to remove category")
-            }
-        }
-        let categoryQuery = `DELETE FROM bh_product_categories WHERE category_id = ?`;
-        return await query(categoryQuery, [category_id]);
-    } catch (error) {
-        console.error("Error deleting category:", error);
-        throw error;
-    }
+// 1️⃣ Check if category exists
+module.exports.CheckCategoryExists = async (category_id) => {
+  const sql = `SELECT * FROM bh_product_categories WHERE category_id = ?`;
+  return await query(sql, [category_id]);
 };
 
-module.exports.CheckUser = async (user_id) => {
-    var Query = `select * from bh_user where user_id=? and user_role="admin"`
-    return await query(Query, [user_id])
-}
+// 2️⃣ Check if subcategories exist under this category
+module.exports.CheckSubCategories = async (category_id) => {
+  const sql = `SELECT * FROM bh_product_sub_categories WHERE sc_category_id = ?`;
+  return await query(sql, [category_id]);
+};
+
+// 3️⃣ Check if products exist under this category
+module.exports.CheckProducts = async (category_id) => {
+  const sql = `SELECT * FROM bh_products WHERE category_id = ?`;
+  return await query(sql, [category_id]);
+};
+
+// 4️⃣ Delete category translations
+module.exports.DeleteCategoryTranslations = async (category_id) => {
+  const sql = `DELETE FROM bh_category_translation WHERE ct_c_id = ?`;
+  return await query(sql, [category_id]);
+};
+
+// 5️⃣ Delete category row
+module.exports.DeleteCategoryRow = async (category_id) => {
+  const sql = `DELETE FROM bh_product_categories WHERE category_id = ?`;
+  return await query(sql, [category_id]);
+};
+
+
+// 1️⃣ Get Subcategory by ID
+module.exports.GetSubcategoryById = async (subcategory_id) => {
+  const sql = `SELECT * FROM bh_product_sub_categories WHERE sc_id = ?`;
+  return await query(sql, [subcategory_id]);
+};
+
+// 2️⃣ Check Products linked to this Subcategory
+module.exports.CheckProductsBySubCategory = async (subcategory_id) => {
+  const sql = `SELECT * FROM bh_products WHERE sub_category_id = ?`;
+  return await query(sql, [subcategory_id]);
+};
+
+// 3️⃣ Delete Subcategory Translations
+module.exports.DeleteSubCategoryTranslations = async (subcategory_id) => {
+  const sql = `DELETE FROM bh_subcategory_translation WHERE sct_c_id = ?`;
+  return await query(sql, [subcategory_id]);
+};
+
+// 4️⃣ Delete Subcategory Row
+module.exports.DeleteSubCategoryRow = async (subcategory_id) => {
+  const sql = `DELETE FROM bh_product_sub_categories WHERE sc_id = ?`;
+  return await query(sql, [subcategory_id]);
+};
