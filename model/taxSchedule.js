@@ -13,9 +13,9 @@ module.exports.GetTaxname = async (tx_schedule_name) => {
     return data;
 };
 
-module.exports.addTaxQuery = async (unit_name) => {
-    let sql = `INSERT INTO tax_schedule (tx_schedule_name) VALUES (?)`;
-    return await query(sql, [unit_name]);
+module.exports.addTaxQuery = async (tx_schedule_name,tx_schedule_tax, tx_schedule_cgst, tx_schedule_igst, tx_schedule_sgst, tx_schedule_vat) => {
+    let sql = `INSERT INTO tax_schedule (tx_schedule_name,tx_schedule_tax,tx_schedule_cgst,tx_schedule_igst,tx_schedule_sgst,tx_schedule_vat) VALUES (?,?,?,?,?,?)`;
+    return await query(sql, [tx_schedule_name,tx_schedule_tax, tx_schedule_cgst, tx_schedule_igst, tx_schedule_sgst, tx_schedule_vat]);
 };
 
 

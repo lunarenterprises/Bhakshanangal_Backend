@@ -89,6 +89,7 @@ module.exports.listTax = async (req, res) => {
 
     }
 }
+
 module.exports.deleteTax = async (req, res) => {
     try {
         let { tx_schedule_id } = req.body || {};
@@ -113,6 +114,7 @@ module.exports.deleteTax = async (req, res) => {
                 message: "Tax not found"
             });
         }
+
     } catch (error) {
         return res.send({
             result: false,
