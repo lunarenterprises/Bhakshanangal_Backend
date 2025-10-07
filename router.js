@@ -281,14 +281,14 @@ route.get('/list/contactus', ListContactus)
 var { orderListDownload } = require('./controller/orderlistDownload')
 route.post('/download/order-list', orderListDownload)
 
-var { AddProductQuestion } = require('./controller/productQuestion')
+var { AddProductQuestion ,ListProductQuestionAnswers,AddProductQuestionAnswer,DeleteProductQuestionAnswer} = require('./controller/productQuestion')
 route.post('/add/product-question',verifyToken, AddProductQuestion)
-
-var { AddProductQuestionAnswer } = require('./controller/productQuestion')
-route.post('/add/product-answer',verifyToken, AddProductQuestionAnswer)
-
-var { ListProductQuestionAnswers } = require('./controller/productQuestion')
 route.post('/list/product-question-answer',verifyToken, ListProductQuestionAnswers)
+route.post('/add/product-answer',verifyToken, AddProductQuestionAnswer)
+route.post('/delete/product-question',verifyToken,authorize('admin'), DeleteProductQuestionAnswer)
+
+
+
 
 var { UpdateDeliveryDate } = require('./controller/UpdateDeliveryStatus')
 route.post('/update/delivery-status', UpdateDeliveryDate)
@@ -302,5 +302,12 @@ var { AddTax,listTax,deleteTax } = require('./controller/taxSchedule')
 route.post('/add/tax', AddTax)
 route.post('/list/tax', listTax)
 route.post('/delete/tax', deleteTax)
+
+var { AddFaq,ListFaqs,EditFaq,DeleteFaq } = require('./controller/faq')
+route.post('/add/faq', AddFaq)
+route.post('/list/faq', ListFaqs)
+route.post('/edit/faq', EditFaq)
+route.post('/delete/faq', DeleteFaq)
+
 
 module.exports = route;

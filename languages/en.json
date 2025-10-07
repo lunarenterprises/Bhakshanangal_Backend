@@ -90,5 +90,6 @@
     "item_already_removed": "item already removed",
     "order_deleted_successfully": "Order deleted successfully",
     "order_delete_failed": "Failed to delete order",
-    "subcategory_added_success":"Sub Category added successfully"
+    "subcategory_added_success":"Sub Category added successfully",
+    "thankyou_for_your_query":"Thank you for your query"
 }
