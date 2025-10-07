@@ -78,7 +78,7 @@ module.exports.AddProductQuestionAnswer = async (req, res) => {
 
 module.exports.ListProductQuestionAnswers = async (req, res) => {
     try {
-        let { pq_p_id } = req.body || {}
+        let { pq_p_id ,lang='en'} = req.body || {}
         let { role } = req.user
         var language = await languages(lang);
 

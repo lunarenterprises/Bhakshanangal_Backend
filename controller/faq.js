@@ -167,6 +167,7 @@ module.exports.ListFaqs = async (req, res) => {
             message: "FAQs retrieved successfully",
             list: faqs
         });
+        
     } catch (error) {
         return res.send({
             result: false,
