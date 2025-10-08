@@ -42,11 +42,6 @@ module.exports.AddBanner = async ({
         vals.push('?');
         params.push(image_path);
     }
-    if (banner_priority !== undefined && banner_priority !== null) {
-        cols.push('banner_priority');
-        vals.push('?');
-        params.push(Number(banner_priority));
-    }
     if (category_id !== undefined) {
         cols.push('category_id');
         vals.push('?');

@@ -30,13 +30,6 @@ module.exports.AddBanner = async (req, res) => {
             } = req.body;
             const lang = req.body.language || 'en';
             const language = await languages(lang);
-            // Basic validation
-            if (!banner_heading || !description) {
-                return res.send({
-                    result: false,
-                    message: language.insufficient_parameters
-                });
-            }
             // Normalize
             const normalizedName = String(banner_heading).trim().toLowerCase();
             const normalizedDesc = String(description).trim();
