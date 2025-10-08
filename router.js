@@ -172,6 +172,9 @@ route.post("/delete-banner", verifyToken, DeleteBanner)
 // add coupon code
 var { addCouponCode } = require('./controller/addCouponCode');
 route.post('/coupon-code/add', addCouponCode);
+// list paginate coupon code
+var { listCouponCodes } = require('./controller/listCouponCode');
+route.post('/coupon-code/list', listCouponCodes);
 var { AddCouponOrOffer } = require('./controller/AddCouopon')
 // route.post("/add-offer-coupon", verifyToken, authorize('admin'), AddCouponOrOffer)
 route.post("/add-offer-coupon", verifyToken, AddCouponOrOffer)
