@@ -5,33 +5,33 @@ module.exports.CategoryList = async (req, res) => {
     try {
         const lang = req.body.language || 'en';
         let { page = 1, limit = 20, search = '' } = req.body;
-        let { role } = req.user
 
-        // Ensure page and limit are integers
-        page = parseInt(page);
-        limit = parseInt(limit);
+        // Make role optional (no crash if req.user missing)
+        const role = (req.user && req.user.role) ? req.user.role : null; // optional role
 
+        // Ensure integers with sane fallbacks
+        page = parseInt(page, 10) || 1;
+        limit = parseInt(limit, 10) || 20;
         const offset = (page - 1) * limit;
 
-        let status = ''
-
-        if (role == 'user') {
-            status = `WHERE category_status = '1'`
-        }
+        // Map role to a status key; anonymous or non-user roles see all by default
+        // Only standard end-user role is restricted to active
+        let statusKey = 'all';
+        if (role === 'user') statusKey = 'active';
 
         const language = await languages(lang);
 
-        // Get total category count with search
-        const getTotalCategory = await model.GetCategoryCount(search); // update model to accept search
+        // Get total count using same filters (lang, statusKey, search); no LIMIT/OFFSET
+        const totalRows = await model.GetCategoryCount(lang, statusKey, search);
 
-        // Get paginated categories with search
-        const getCategory = await model.GetCategory(lang, status, offset, limit, search); // update model to accept search
+        // Get paginated list using same filters and ORDER BY for stable pagination
+        const categories = await model.GetCategory(lang, statusKey, offset, limit, search);
 
-        const categoryCount = getCategory.length;
-        const totalPage = Math.ceil(categoryCount / limit);
+        const totalCount = totalRows?.[0]?.total || 0;
+        const totalPage = Math.ceil(totalCount / limit);
 
-        // Attach product count for each category
-        const data = await Promise.all(getCategory.map(async (el) => {
+        // Attach product count
+        const data = await Promise.all(categories.map(async (el) => {
             const count = await model.GetProductCategoryCount(el.category_id);
             return {
                 ...el,
@@ -54,7 +54,6 @@ module.exports.CategoryList = async (req, res) => {
                 message: language.data_not_found
             });
         }
-
     } catch (error) {
         return res.send({
             result: false,
@@ -64,44 +63,48 @@ module.exports.CategoryList = async (req, res) => {
 };
 
 
+
 module.exports.SubCategoryList = async (req, res) => {
     try {
         const lang = req.body.language || 'en';
         let { category_id, page = 1, limit = 20, search = '' } = req.body;
-        let { role } = req.user
-        page = parseInt(page);
-        limit = parseInt(limit);
+        // Make role optional; default to 'guest' (no privileged data assumed)
+        const role = (req.user && req.user.role) ? req.user.role : 'guest';
+
+        page = parseInt(page, 10) || 1;
+        limit = parseInt(limit, 10) || 20;
         const offset = (page - 1) * limit;
 
-        console.log("rrrr", req.user);
-
-        let status = ''
-
-        if (role == 'user') {
-            status = `WHERE sc.sc_status = '1'`
+        // Map role -> status filter without injecting raw SQL
+        // Only customers/guests see active items by default
+        // Admins/managers can see all
+        let statusKey = 'all';
+        if (role === 'user' || role === 'guest') {
+            statusKey = 'active';
         }
 
         const language = await languages(lang);
 
-        // Get total subcategory count with search
-        const getTotalSubCategory = await model.GetSubCategoryCount(lang, search); // Update model to support search
+        // Total count with same filters (for correct pagination)
+        const totalRowsResult = await model.GetSubCategoryCount(lang, statusKey, category_id, search);
+        const totalCount = totalRowsResult?.[0]?.total || 0;
 
+        // Paged data
+        const getSubCategory = await model.GetSubCategory(lang, statusKey, category_id, search, offset, limit);
 
-        // Get paginated subcategories with search
-        const getSubCategory = await model.GetSubCategory(lang, status, category_id, search, offset, limit); // Update model to accept pagination & search
-
-        const totalCount = getSubCategory.length;
         const totalPage = Math.ceil(totalCount / limit);
 
         // Attach product count for each subcategory
-        const data = await Promise.all(getSubCategory.map(async (el) => {
-            const count = await model.GetProductSubCategoryCount(el.sc_id);
-            return {
-                ...el,
-                category_image: el.sc_image,
-                product_count: count.length
-            };
-        }));
+        const data = await Promise.all(
+            getSubCategory.map(async (el) => {
+                const count = await model.GetProductSubCategoryCount(el.sc_id);
+                return {
+                    ...el,
+                    category_image: el.sc_image,
+                    product_count: count.length
+                };
+            })
+        );
 
         if (data.length > 0) {
             return res.send({
@@ -110,15 +113,20 @@ module.exports.SubCategoryList = async (req, res) => {
                 page,
                 limit,
                 totalPage,
+                totalCount,
                 list: data
             });
         } else {
             return res.send({
                 result: false,
-                message: language.data_not_found
+                message: language.data_not_found,
+                page,
+                limit,
+                totalPage,
+                totalCount,
+                list: []
             });
         }
-
     } catch (error) {
         return res.send({
             result: false,
@@ -126,3 +134,4 @@ module.exports.SubCategoryList = async (req, res) => {
         });
     }
 };
+

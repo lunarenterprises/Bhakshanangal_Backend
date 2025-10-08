@@ -3,54 +3,121 @@ var util = require("util")
 const query = util.promisify(db.query).bind(db);
 
 module.exports.CheckUserQuery = async (user_id) => {
-    var Query = `select * from bh_user where user_id = ? and user_status = 'active'`;
-    var data = query(Query, [user_id]);
-    return data;
+  var Query = `select * from bh_user where user_id = ? and user_status = 'active'`;
+  var data = query(Query, [user_id]);
+  return data;
 };
 
-module.exports.GetCategory = async (lang,status, offset, limit, search = '') => {
-    let Query = `
-        SELECT 
-            category_id,
-            ct_language_name AS category_name,
-            category_image,
-            category_status
-        FROM bh_category_translation
-        INNER JOIN bh_product_categories ON ct_c_id = category_id
-        INNER JOIN bh_languages ON ct_language_id = language_id ${status} 
-        AND language_code = ? `;
+module.exports.GetCategory = async (lang, statusKey = 'all', offset = 0, limit = 20, search = '') => {
+  // Whitelist status keys to safe SQL fragments
+  const allowedStatusMap = {
+    active: 'pc.category_status = 1',
+    inactive: 'pc.category_status = 0',
+    all: null
+  };
+  const statusClause = allowedStatusMap[statusKey] || null;
 
-    const params = [lang];
+  let Query = `
+    SELECT 
+      pc.category_id,
+      ct.ct_language_name AS category_name,
+      pc.category_image,
+      pc.category_status
+    FROM bh_category_translation ct
+    INNER JOIN bh_product_categories pc ON ct.ct_c_id = pc.category_id
+    INNER JOIN bh_languages l ON ct.ct_language_id = l.language_id
+    WHERE 1=1
+      AND l.language_code = ?
+  `;
 
-    // Add search filter if provided
-    if (search && search.trim() !== '') {
-        Query += ` AND ct_language_name LIKE ?`;
-        params.push(`%${search}%`);
-    }
+  const params = [lang];
 
-    // Add pagination
+  // Optional status filter
+  if (statusClause) {
+    Query += ` AND ${statusClause}`;
+  }
+
+  // Add search filter if provided
+  if (search && search.trim() !== '') {
+    Query += ` AND ct.ct_language_name LIKE ?`;
+    params.push(`%${search}%`);
+  }
+
+  // Deterministic order for stable pagination
+  Query += ` ORDER BY pc.category_id DESC`;
+
+  // Pagination
+  if (limit && Number(limit) > 0) {
     Query += ` LIMIT ? OFFSET ?`;
-    params.push(limit, offset);
+    // For mysql2 .query use numbers; for .execute consider strings
+    params.push(Number(limit), Number(offset || 0));
+  }
 
-    const data = await query(Query, params);
-    return data;
+  const data = await query(Query, params);
+  return data;
 };
 
 
 module.exports.GetProductCategoryCount = async (category_id) => {
-    var Query = `select * from bh_products where category_id = ?`;
-    var data = query(Query, [category_id]);
-    return data;
+  var Query = `select * from bh_products where category_id = ?`;
+  var data = query(Query, [category_id]);
+  return data;
 };
 
-module.exports.GetCategoryCount = async () => {
-    var Query = `select * from bh_product_categories`;
-    var data = query(Query);
-    return data;
-};
+// Returns total rows matching filters for accurate pagination
+module.exports.GetCategoryCount = async (lang, statusKey = 'all', search = '') => {
+  // Map allowed status keys to safe SQL fragments
+  const allowedStatusMap = {
+    active: 'pc.category_status = 1',
+    inactive: 'pc.category_status = 0',
+    all: null
+  };
+  const statusClause = allowedStatusMap[statusKey] || null;
 
-module.exports.GetSubCategory = async (lang, statusCondition = '', category_id = null, search = '', offset = 0, limit = 10) => {
+  let Query = `
+    SELECT COUNT(DISTINCT pc.category_id) AS total
+    FROM bh_category_translation ct
+    INNER JOIN bh_product_categories pc
+      ON ct.ct_c_id = pc.category_id
+    INNER JOIN bh_languages l
+      ON ct.ct_language_id = l.language_id
+    WHERE 1=1
+      AND l.language_code = ?
+  `;
+  const params = [lang];
+
+  if (statusClause) {
+    Query += ` AND ${statusClause}`;
+  }
+
+  if (search && search.trim() !== '') {
+    // match translated category name
+    Query += ` AND ct.ct_language_name LIKE ?`;
+    params.push(`%${search}%`);
+  }
+
+  // Optional: if there is a soft delete flag, include it here, e.g.
+  // Query += ` AND pc.deleted_at IS NULL`;
+
+  const data = await query(Query, params);
+  return data;
+};
+module.exports.GetSubCategory = async (
+  lang,
+  statusCondition = 'all',
+  category_id = null,
+  search = '',
+  offset = 0,
+  limit = 10
+) => {
   try {
+    const allowedStatusMap = {
+      'active': 'sc.sc_status = 1',
+      'inactive': 'sc.sc_status = 0',
+      'all': null
+    };
+    const statusClause = statusCondition && allowedStatusMap[statusCondition] ? allowedStatusMap[statusCondition] : null;
+
     let Query = `
       SELECT 
           sc.sc_id, 
@@ -68,53 +135,84 @@ module.exports.GetSubCategory = async (lang, statusCondition = '', category_id =
       INNER JOIN bh_languages l 
           ON sct.sct_language_id = l.language_id
       WHERE 1=1
+        AND l.language_code = ?
     `;
 
     const params = [lang];
 
-    // Status condition (make sure this is safe, predefined)
-    if (statusCondition) {
-      Query += ` AND ${statusCondition}`;
+    if (statusClause) {
+      Query += ` AND ${statusClause}`;
     }
 
-    // Language filter
-    Query += ` AND l.language_code = ?`;
-
-    // Filter by category_id if provided
-    if (category_id) {
+    if (category_id !== null && category_id !== undefined) {
       Query += ` AND sc.sc_category_id = ?`;
       params.push(category_id);
     }
 
-    // Filter by search if provided (applies under category if category_id is passed)
     if (search && search.trim() !== '') {
       Query += ` AND sct.sct_language_name LIKE ?`;
       params.push(`%${search}%`);
     }
 
-    // Pagination
-    if (limit > 0) {
+    if (limit && Number(limit) > 0) {
       Query += ` LIMIT ? OFFSET ?`;
-      params.push(limit, offset);
+      params.push(Number(limit), Number(offset || 0)); // .query expects numbers
     }
 
     const data = await query(Query, params);
     return data;
-
   } catch (error) {
     throw new Error(error.message);
   }
 };
+module.exports.GetSubCategoryCount = async (
+  lang,
+  statusCondition = 'all',
+  category_id = null,
+  search = ''
+) => {
+  const allowedStatusMap = {
+    'active': 'sc.sc_status = 1',
+    'inactive': 'sc.sc_status = 0',
+    'all': null
+  };
+  const statusClause = statusCondition && allowedStatusMap[statusCondition] ? allowedStatusMap[statusCondition] : null;
 
+  let Query = `
+    SELECT COUNT(*) AS total
+    FROM bh_subcategory_translation sct
+    INNER JOIN bh_product_sub_categories sc 
+      ON sct.sct_c_id = sc.sc_id
+    INNER JOIN bh_category_translation c 
+      ON sc.sc_category_id = c.ct_c_id 
+     AND c.ct_language_id = sct.sct_language_id
+    INNER JOIN bh_languages l 
+      ON sct.sct_language_id = l.language_id
+    WHERE 1=1
+      AND l.language_code = ?
+  `; // language filter applied consistently [web:17][web:29]
 
-module.exports.GetSubCategoryCount = async () => {
-    var Query = `select * from bh_product_sub_categories`;
-    var data = query(Query);
-    return data;
+  const params = [lang];
+
+  if (statusClause) {
+    Query += ` AND ${statusClause}`;
+  }
+
+  if (category_id !== null && category_id !== undefined) {
+    Query += ` AND sc.sc_category_id = ?`;
+    params.push(category_id);
+  }
+
+  if (search && search.trim() !== '') {
+    Query += ` AND sct.sct_language_name LIKE ?`;
+    params.push(`%${search}%`);
+  }
+
+  const data = await query(Query, params);
+  return data;
 };
-
 module.exports.GetProductSubCategoryCount = async (category_id) => {
-    var Query = `select * from bh_products where sub_category_id = ?`;
-    var data = query(Query, [category_id]);
-    return data;
+  var Query = `select * from bh_products where sub_category_id = ?`;
+  var data = query(Query, [category_id]);
+  return data;
 };
