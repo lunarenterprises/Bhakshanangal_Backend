@@ -20,7 +20,6 @@ module.exports.AddBanner = async ({
     image_path,           // stored file path
     category_id = null,   // optional FK
     product_id = null,    // optional FK
-    created_by = null     // optional auditing
 }) => {
     // Allowlist of columns we support inserting
     const cols = [];
@@ -51,11 +50,6 @@ module.exports.AddBanner = async ({
         cols.push('product_id');
         vals.push('?');
         params.push(product_id === null ? null : Number(product_id));
-    }
-    if (created_by !== undefined) {
-        cols.push('created_by');
-        vals.push('?');
-        params.push(created_by);
     }
 
     // Fallback: ensure minimum required fields
