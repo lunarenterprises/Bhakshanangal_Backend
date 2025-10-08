@@ -169,7 +169,21 @@ route.post("/banner/list", BannerList)
 var { DeleteBanner } = require("./controller/deletebanner");
 // route.post("/delete-banner", verifyToken, authorize('admin'), DeleteBanner)
 route.post("/delete-banner", verifyToken, DeleteBanner)
+// add coupon code
+var { addCouponCode } = require('./controller/addCouponCode');
+route.post('/coupon-code/add', addCouponCode);
 
+// list paginate coupon code
+var { listCouponCodes } = require('./controller/listCouponCode');
+route.post('/coupon-code/list', listCouponCodes);
+var { deleteCouponById } = require('./controller/deleteCouponCode');
+route.post('/coupon-code/delete', deleteCouponById);
+//get coupon code by id
+var { getCouponById } = require('./controller/getCouponCode');
+// edit couponcode
+var { editCouponCode } = require('./controller/editCouponCode');
+route.post('/coupon-code/edit', editCouponCode);
+route.post('/coupon-code/get', getCouponById);
 var { AddCouponOrOffer } = require('./controller/AddCouopon')
 // route.post("/add-offer-coupon", verifyToken, authorize('admin'), AddCouponOrOffer)
 route.post("/add-offer-coupon", verifyToken, AddCouponOrOffer)

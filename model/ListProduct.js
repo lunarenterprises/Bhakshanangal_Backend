@@ -72,7 +72,7 @@ module.exports.GetAllProductsCount = async ({
     statusKey = 'all' // 'active' for end-user visibility, 'all' otherwise
 }) => {
     // Whitelist for product visibility
-    const allowedProductStatus = {
+    const allowedProductStatus = {  
         active: 'p.product_status = "active"',
         all: null
     };
