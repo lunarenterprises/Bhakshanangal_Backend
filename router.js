@@ -175,6 +175,11 @@ route.post('/coupon-code/add', addCouponCode);
 // list paginate coupon code
 var { listCouponCodes } = require('./controller/listCouponCode');
 route.post('/coupon-code/list', listCouponCodes);
+var { deleteCouponById } = require('./controller/deleteCouponCode');
+route.post('/coupon-code/delete', deleteCouponById);
+//get coupon code by id
+var { getCouponById } = require('./controller/getCouponCode');
+route.post('/coupon-code/get', getCouponById);
 var { AddCouponOrOffer } = require('./controller/AddCouopon')
 // route.post("/add-offer-coupon", verifyToken, authorize('admin'), AddCouponOrOffer)
 route.post("/add-offer-coupon", verifyToken, AddCouponOrOffer)
