@@ -9,6 +9,15 @@ module.exports.addCouponCode = async (req, res) => {
                 message: "Missing required coupon fields."
             });
         }
+        // Check if couponCode already exists
+        const exists = await model.checkCouponCodeExists(couponCode);
+        if (exists) {
+            return res.send({
+                result: false,
+                status: 'exists',
+                message: "Coupon code already exists."
+            });
+        }
         const result = await model.insertCouponCode(couponCode, isActive, expiryDate, couponDiscount, minPurchaseAmount);
         return res.send({
             result: true,
