@@ -5,7 +5,7 @@ const { verifyToken, authorize } = require('./middleware/authMiddleware')
 
 var { ApikeyVerify } = require("./components/ApiKeyVerify");
 route.get('/', (req, res) => {
-    res.send('hello bhakshanangal')
+    res.send('bhakshanangal backend is live')
 })
 var { Regsiter } = require("./controller/registration");
 route.post("/signup", Regsiter);
@@ -36,23 +36,23 @@ route.post("/remove-address", verifyToken, RemoveAddress);
 
 var { AddProducts, AddProductVariants, EditProduct, EditProductVariant } = require("./controller/Addproduct");
 route.post("/addproduct", verifyToken, authorize('admin'), AddProducts);
-route.post("/product/addvariant", verifyToken, authorize('admin'),AddProductVariants);
-route.post("/editproduct",verifyToken, EditProduct);
-route.post("/product/editvariant",verifyToken, EditProductVariant);
+route.post("/product/addvariant", verifyToken, authorize('admin'), AddProductVariants);
+route.post("/editproduct", verifyToken, EditProduct);
+route.post("/product/editvariant", verifyToken, EditProductVariant);
 
-var { AddCategory,EditCategory,AddSubCategory,EditSubCategory } = require("./controller/AddCategory");
+var { AddCategory, EditCategory, AddSubCategory, EditSubCategory } = require("./controller/AddCategory");
 // route.post("/add-category", verifyToken, authorize('admin'), AddCategory)
 route.post("/add-category", verifyToken, AddCategory)
 route.post("/edit-category", verifyToken, EditCategory)
-route.post("/add-subcategory",verifyToken, AddSubCategory)
-route.post("/edit-subcategory",verifyToken, EditSubCategory)
+route.post("/add-subcategory", verifyToken, AddSubCategory)
+route.post("/edit-subcategory", verifyToken, EditSubCategory)
 
-var { CategoryList,SubCategoryList } = require('./controller/categorylist')
-route.post('/categorylist',verifyToken, CategoryList)
-route.post('/list/sub-category',verifyToken, SubCategoryList)
+var { CategoryList, SubCategoryList } = require('./controller/categorylist')
+route.post('/categorylist', CategoryList)
+route.post('/list/sub-category', SubCategoryList)
 
 var { ListAllProduct, ViewProduct } = require("./controller/ListProduct");
-route.post("/productlist",verifyToken, ListAllProduct);
+route.post("/productlist", ListAllProduct);
 route.post('/viewproduct', ViewProduct)
 
 var { ViewProducts } = require("./controller/viewProduct");
@@ -149,7 +149,7 @@ route.post("/delivery/status/list", verifyToken, DeliveryStatusList)
 
 var { UpdateDeliveryStatus } = require('./controller/order_delivery_status_update')
 // route.post("/delivery/status/update", verifyToken, authorize('admin'), UpdateDeliveryStatus)
-route.post("/delivery/status/update", verifyToken,  UpdateDeliveryStatus)
+route.post("/delivery/status/update", verifyToken, UpdateDeliveryStatus)
 
 var { OrderVIew } = require('./controller/order_view')
 // route.post("/order/view", verifyToken, authorize('admin'), OrderVIew)
@@ -157,11 +157,11 @@ route.post("/order/view", OrderVIew)
 
 var { PaymentList } = require('./controller/paymentlist')
 // route.post("/payment/list", verifyToken, authorize('admin'), PaymentList)
-route.post("/payment/list", verifyToken,  PaymentList)
+route.post("/payment/list", verifyToken, PaymentList)
 
 var { AddBanner } = require('./controller/createbanner')
 // route.post("/banner/create", verifyToken, authorize('admin'), AddBanner)
-route.post("/banner/create", verifyToken,  AddBanner)
+route.post("/banner/create", verifyToken, AddBanner)
 
 var { BannerList } = require('./controller/bannerlist')
 route.post("/banner/list", BannerList)
@@ -172,11 +172,11 @@ route.post("/delete-banner", verifyToken, DeleteBanner)
 
 var { AddCouponOrOffer } = require('./controller/AddCouopon')
 // route.post("/add-offer-coupon", verifyToken, authorize('admin'), AddCouponOrOffer)
-route.post("/add-offer-coupon", verifyToken,  AddCouponOrOffer)
+route.post("/add-offer-coupon", verifyToken, AddCouponOrOffer)
 
 var { DashboardProductsCart } = require('./controller/dashboard_product_cart')
 // route.post("/dashboard/product/cart", verifyToken, authorize('admin'), DashboardProductsCart)
-route.post("/dashboard/product/cart", verifyToken,  DashboardProductsCart)
+route.post("/dashboard/product/cart", verifyToken, DashboardProductsCart)
 
 var { BestSellingProducts } = require('./controller/bestSellingproducts')
 route.post("/product/best-selling", BestSellingProducts)
@@ -268,9 +268,9 @@ route.post('/update/delivery-status', UpdateDeliveryStatus)
 var { UpdatePaymentStatus } = require('./controller/UpdatePaymentStatus')
 route.post('/update/order-status', UpdatePaymentStatus)
 
-var { DeleteCategory,DeleteSubCategory } = require('./controller/DeleteCategory')
-route.post('/delete-category',verifyToken, DeleteCategory)
-route.post('/delete-subcategory',verifyToken, DeleteSubCategory)
+var { DeleteCategory, DeleteSubCategory } = require('./controller/DeleteCategory')
+route.post('/delete-category', verifyToken, DeleteCategory)
+route.post('/delete-subcategory', verifyToken, DeleteSubCategory)
 
 var { CreateContactUs } = require('./controller/ContactUs')
 route.post('/contactus', CreateContactUs)
@@ -281,11 +281,11 @@ route.get('/list/contactus', ListContactus)
 var { orderListDownload } = require('./controller/orderlistDownload')
 route.post('/download/order-list', orderListDownload)
 
-var { AddProductQuestion ,ListProductQuestionAnswers,AddProductQuestionAnswer,DeleteProductQuestionAnswer} = require('./controller/productQuestion')
-route.post('/add/product-question',verifyToken, AddProductQuestion)
-route.post('/list/product-question-answer',verifyToken, ListProductQuestionAnswers)
-route.post('/add/product-answer',verifyToken, AddProductQuestionAnswer)
-route.post('/delete/product-question',verifyToken,authorize('admin'), DeleteProductQuestionAnswer)
+var { AddProductQuestion, ListProductQuestionAnswers, AddProductQuestionAnswer, DeleteProductQuestionAnswer } = require('./controller/productQuestion')
+route.post('/add/product-question', verifyToken, AddProductQuestion)
+route.post('/list/product-question-answer', verifyToken, ListProductQuestionAnswers)
+route.post('/add/product-answer', verifyToken, AddProductQuestionAnswer)
+route.post('/delete/product-question', verifyToken, authorize('admin'), DeleteProductQuestionAnswer)
 
 
 
@@ -293,17 +293,17 @@ route.post('/delete/product-question',verifyToken,authorize('admin'), DeleteProd
 var { UpdateDeliveryDate } = require('./controller/UpdateDeliveryStatus')
 route.post('/update/delivery-status', UpdateDeliveryDate)
 
-var { AddUnit,listUnit,deleteUnit } = require('./controller/unit')
+var { AddUnit, listUnit, deleteUnit } = require('./controller/unit')
 route.post('/add/unit', AddUnit)
 route.post('/list/unit', listUnit)
 route.post('/delete/unit', deleteUnit)
 
-var { AddTax,listTax,deleteTax } = require('./controller/taxSchedule')
+var { AddTax, listTax, deleteTax } = require('./controller/taxSchedule')
 route.post('/add/tax', AddTax)
 route.post('/list/tax', listTax)
 route.post('/delete/tax', deleteTax)
 
-var { AddFaq,ListFaqs,EditFaq,DeleteFaq } = require('./controller/faq')
+var { AddFaq, ListFaqs, EditFaq, DeleteFaq } = require('./controller/faq')
 route.post('/add/faq', AddFaq)
 route.post('/list/faq', ListFaqs)
 route.post('/edit/faq', EditFaq)

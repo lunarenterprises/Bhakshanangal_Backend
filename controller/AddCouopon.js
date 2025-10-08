@@ -49,7 +49,6 @@ module.exports.AddCouponOrOffer = async (req, res) => {
                 if (!coupon_code) {
                     coupon_code = coupongenerator()
                 }
-                console.log(coupon_code, "coupon_code");
                 var checkCoupon = await model.GetcouponCheck(name)
                 if (checkCoupon.length > 0) {
                     let coupon_id = checkCoupon[0].coupon_id

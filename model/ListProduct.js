@@ -64,34 +64,42 @@ module.exports.GetImages = async (product_id) => {
     return data;
 
 }
-
-// module.exports.GetAllProducts = async () => {
-//     var Query = `SELECT DISTINCT p.*, pc.*, ps.*, t.*, pr.* 
-//     FROM bh_products p LEFT JOIN bh_product_categories pc ON pc.category_id = p.category_id AND pc.category_status = 'active' 
-//     LEFT JOIN bh_product_stock ps ON ps.product_id = p.product_id 
-//     LEFT JOIN bh_product_translations t ON t.product_id = p.product_id
-//     LEFT JOIN bh_product_prices pr ON pr.product_id = p.product_id WHERE p.product_status = 'active' `
-//     var data = query(Query);
-//     return data;
-// }
-
-module.exports.GetAllProducts = async ({category_id, sub_category_id = null, search = '', page = 1, limit = 10 }) => {
-    const offset = (page - 1) * limit;
+module.exports.GetAllProductsCount = async ({
+    category_id,
+    sub_category_id = null,
+    search = '',
+    lang = 'en',     // kept for symmetry; apply if product/category translations are added
+    statusKey = 'all' // 'active' for end-user visibility, 'all' otherwise
+}) => {
+    // Whitelist for product visibility
+    const allowedProductStatus = {
+        active: 'p.product_status = "active"',
+        all: null
+    };
+    const productStatusClause = allowedProductStatus[statusKey] || null;
 
     let Query = `
-        SELECT p.*, pc.*,ts.*, psc.sc_id AS sub_category_id, psc.sc_name AS sub_category_name
-        FROM bh_products p
-        LEFT JOIN bh_product_categories pc 
-               ON pc.category_id = p.category_id AND pc.category_status = 'active'
-        LEFT JOIN bh_product_sub_categories psc 
-               ON psc.sc_id = p.sub_category_id AND psc.sc_status = '1'
-        LEFT JOIN tax_schedule ts 
-               ON ts.tx_schedule_id  = p.tax_value_id 
-        WHERE p.product_status = 'active' `;
+    SELECT COUNT(DISTINCT p.product_id) AS total
+    FROM bh_products p
+    LEFT JOIN bh_product_categories pc 
+      ON pc.category_id = p.category_id
+     AND pc.category_status = 'active'
+    LEFT JOIN bh_product_sub_categories psc 
+      ON psc.sc_id = p.sub_category_id
+     AND psc.sc_status = '1'
+    LEFT JOIN tax_schedule ts 
+      ON ts.tx_schedule_id = p.tax_value_id
+    WHERE 1=1
+  `;
 
     const params = [];
 
-   if (category_id) {
+    // Main product visibility
+    if (productStatusClause) {
+        Query += ` AND ${productStatusClause}`;
+    }
+
+    if (category_id) {
         Query += ` AND p.category_id = ?`;
         params.push(category_id);
     }
@@ -101,25 +109,91 @@ module.exports.GetAllProducts = async ({category_id, sub_category_id = null, sea
         params.push(sub_category_id);
     }
 
-    // Add search filter if provided
     if (search && search.trim() !== '') {
         Query += ` AND (p.product_name LIKE ? OR pc.category_name LIKE ? OR psc.sc_name LIKE ?)`;
-        params.push(`%${search}%`, `%${search}%`, `%${search}%`);
+        const like = `%${search}%`;
+        params.push(like, like, like);
     }
 
-    // Order by latest created
+    // Note: If language-specific translations are later joined, add language_code filter similarly to listing.
+
+    const rows = await query(Query, params);
+    return rows; // [{ total: N }]
+};
+
+module.exports.GetAllProducts = async ({
+    category_id,
+    sub_category_id = null,
+    search = '',
+    page = 1,
+    limit = 10,
+    offset,          // allow passing precomputed offset
+    lang = 'en',
+    statusKey = 'all' // 'active' for end-user visibility, 'all' otherwise
+}) => {
+    const pageNum = parseInt(page, 10) || 1;
+    const pageLimit = parseInt(limit, 10) || 10;
+    const pageOffset = (typeof offset === 'number') ? offset : (pageNum - 1) * pageLimit;
+
+    // Whitelist for product visibility
+    const allowedProductStatus = {
+        active: 'p.product_status = "active"',
+        all: null
+    };
+    const productStatusClause = allowedProductStatus[statusKey] || null;
+
+    let Query = `
+    SELECT
+      p.*,
+      pc.*,
+      ts.*,
+      psc.sc_id AS sub_category_id,
+      psc.sc_name AS sub_category_name
+    FROM bh_products p
+    LEFT JOIN bh_product_categories pc 
+      ON pc.category_id = p.category_id
+     AND pc.category_status = 'active'
+    LEFT JOIN bh_product_sub_categories psc 
+      ON psc.sc_id = p.sub_category_id
+     AND psc.sc_status = '1'
+    LEFT JOIN tax_schedule ts 
+      ON ts.tx_schedule_id = p.tax_value_id
+    WHERE 1=1
+  `;
+
+    const params = [];
+
+    // Product visibility (optional based on role)
+    if (productStatusClause) {
+        Query += ` AND ${productStatusClause}`;
+    }
+
+    if (category_id) {
+        Query += ` AND p.category_id = ?`;
+        params.push(category_id);
+    }
+
+    if (sub_category_id) {
+        Query += ` AND p.sub_category_id = ?`;
+        params.push(sub_category_id);
+    }
+
+    // Grouped search across multiple columns to keep AND/OR precedence correct
+    if (search && search.trim() !== '') {
+        Query += ` AND (p.product_name LIKE ? OR pc.category_name LIKE ? OR psc.sc_name LIKE ?)`;
+        const like = `%${search}%`;
+        params.push(like, like, like);
+    } // [web:104]
+
+    // Deterministic order for pagination
     Query += ` ORDER BY p.created_at DESC`;
 
     // Pagination
     Query += ` LIMIT ? OFFSET ?`;
-    params.push(Number(limit), Number(offset));
+    params.push(Number(pageLimit), Number(pageOffset));
 
     return await query(Query, params);
 };
-
-
-
-
 module.exports.GetProductVariants = async (product_id) => {
     let Query = `
         SELECT v.bpv_id,
@@ -144,8 +218,6 @@ module.exports.GetProductVariants = async (product_id) => {
     `;
     return await query(Query, [product_id]);
 }
-
-
 module.exports.GetProductTranslation = async (product_id) => {
     let Query = `
         SELECT t.*, l.language_name, l.language_code
@@ -156,7 +228,6 @@ module.exports.GetProductTranslation = async (product_id) => {
     `;
     return await query(Query, [product_id]);
 }
-
 module.exports.GetCategoryTranslation = async (category_id) => {
     let Query = `
         SELECT ct.*, l.language_name, l.language_code
