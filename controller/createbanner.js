@@ -59,16 +59,6 @@ module.exports.AddBanner = async (req, res) => {
                 });
             }
 
-            // Duplicate check by normalized heading
-            const existing = await model.GetBannerByName(normalizedName);
-            if (existing.length > 0) {
-                return res.send({
-                    result: false,
-                    message: language.banner_already_exist,
-                    status: "Exists"
-                });
-            }
-
             // Create banner with new fields
             await model.AddBanner({
                 banner_name: normalizedName,
