@@ -183,6 +183,7 @@ var { getCouponById } = require('./controller/getCouponCode');
 // edit couponcode
 var { editCouponCode } = require('./controller/editCouponCode');
 route.post('/coupon-code/edit', editCouponCode);
+// get coupon code by Id
 route.post('/coupon-code/get', getCouponById);
 var { AddCouponOrOffer } = require('./controller/AddCouopon')
 // route.post("/add-offer-coupon", verifyToken, authorize('admin'), AddCouponOrOffer)
