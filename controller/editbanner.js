@@ -66,9 +66,10 @@ module.exports.EditBanner = async (req, res) => {
       const updatedData = {
         banner_id,
         banner_heading,
+        description,
+        filePath,
         category_id,
         product_id,
-        description
       };
 
       // Update banner
