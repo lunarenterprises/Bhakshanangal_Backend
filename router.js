@@ -166,8 +166,8 @@ route.post("/banner/create", verifyToken, AddBanner)
 var { BannerList } = require('./controller/bannerlist')
 route.post("/banner/list", BannerList)
 
-var {EditBanner} = require('./controller/editbanner');
-route.post("/banner/edit", EditBanner)
+var { EditBanner } = require('./controller/editbanner');
+route.post("/banner/edit", verifyToken, EditBanner)
 
 
 var { DeleteBanner } = require("./controller/deletebanner");
