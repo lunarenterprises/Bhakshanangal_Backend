@@ -2,9 +2,7 @@ var model = require("../model/editbanner"); // your model
 var { languages } = require("../languages/languageFunc");
 const { upload } = require("../components/banner");
 const moment = require("moment");
-
 const Uploads = upload.array("image");
-
 module.exports.EditBanner = async (req, res) => {
   try {
     // Execute upload middleware (Multer) and proceed in its callback
@@ -17,13 +15,13 @@ module.exports.EditBanner = async (req, res) => {
       }
 
       // Get user_id from JWT or fallback header
-      const user_id = (req?.user && req.user.user_id) ? req.user.user_id : (req?.headers?.user_id || null);
-      if (!user_id) {
-        return res.status(401).send({
-          result: false,
-          message: "User ID is required"
-        });
-      }
+      // const user_id = (req?.user && req.user.user_id) ? req.user.user_id : (req?.headers?.user_id || null);
+      // if (!user_id) {
+      //   return res.status(401).send({
+      //     result: false,
+      //     message: "User ID is required"
+      //   });
+      // }
 
       // Language pack
       const lang = req.body.language || "en";
@@ -48,13 +46,13 @@ module.exports.EditBanner = async (req, res) => {
       }
 
       // Admin check
-      const CheckAdmin = await model.CheckAdminQuery(user_id);
-      if (!Array.isArray(CheckAdmin) || CheckAdmin.length === 0) {
-        return res.send({
-          result: false,
-          message: language.Try_with_admin_level_Account || "Try with admin level Account"
-        });
-      }
+      // const CheckAdmin = await model.CheckAdminQuery(user_id);
+      // if (!Array.isArray(CheckAdmin) || CheckAdmin.length === 0) {
+      //   return res.send({
+      //     result: false,
+      //     message: language.Try_with_admin_level_Account || "Try with admin level Account"
+      //   });
+      // }
 
       // Fetch existing banner
       const existingRows = await model.GetBannerById(Number(banner_id));

@@ -31,7 +31,7 @@ module.exports.UpdateBanner = async (banner_id, payload = {}) => {
 
     // map request keys => DB columns (no banner_priority here)
     const map = {
-      banner_heading: 'banner_heading',
+      banner_heading: 'banner_name',
       description: 'description',
       image_path: 'banner_image',
       category_id: 'category_id',
