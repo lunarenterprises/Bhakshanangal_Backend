@@ -1,81 +1,71 @@
 var db = require("../db/db");
-var util = require("util");
+var util = require("util")
 const query = util.promisify(db.query).bind(db);
 
-// ✅ Check if user is admin
 module.exports.CheckAdminQuery = async (user_id) => {
-  const sql = `
-    SELECT * 
-    FROM bh_user 
-    WHERE user_id = ? 
-      AND user_status = 'active' 
-      AND user_role = 'admin'
-  `;
-  const data = await query(sql, [user_id]);
-  return data;
+    var Query = `select * from bh_user where user_id = ? and user_status = 'active' and user_role = 'admin'`;
+    var data = await query(Query, [user_id]);
+    return data;
 };
 
-// ✅ Get banner by ID
-module.exports.GetBannerById = async (banner_id) => {
-  const sql = "SELECT * FROM bh_banner WHERE banner_id = ?";
-  const data = await query(sql, [banner_id]);
-  return data;
+module.exports.Getbanner = async (banner_name) => {
+    var Query = `select * from bh_banner where banner_name = ?`;
+    var data = await query(Query, [banner_name]);
+    return data;
 };
 
-// ✅ Update banner by ID (similar to AddBanner insert style)
-module.exports.UpdateBanner = async ({
-  banner_id,
-  banner_name,
-  description,
-  image_path,
-  category_id = null,
-  product_id = null,
-  updated_by,
-  updated_at,
+module.exports.AddBanner = async ({
+    banner_name,          // normalized name (e.g., lowercase)
+    description,          // text
+    image_path,           // stored file path
+    category_id = null,   // optional FK
+    product_id = null,    // optional FK
 }) => {
-  if (!banner_id) throw new Error("banner_id is required");
+    // Allowlist of columns we support inserting
+    const cols = [];
+    const vals = [];
+    const params = [];
 
-  const cols = [];
-  const params = [];
+    if (banner_name !== undefined) {
+        cols.push('banner_name');
+        vals.push('?');
+        params.push(banner_name);
+    }
+    if (description !== undefined) {
+        cols.push('description');
+        vals.push('?');
+        params.push(description);
+    }
+    if (image_path !== undefined) {
+        cols.push('banner_image');
+        vals.push('?');
+        params.push(image_path);
+    }
+    if (category_id !== undefined) {
+        cols.push('category_id');
+        vals.push('?');
+        params.push(category_id === null ? null : Number(category_id));
+    }
+    if (product_id !== undefined) {
+        cols.push('product_id');
+        vals.push('?');
+        params.push(product_id === null ? null : Number(product_id));
+    }
 
-  if (banner_name !== undefined) {
-    cols.push("banner_name = ?");
-    params.push(banner_name);
-  }
-  if (description !== undefined) {
-    cols.push("description = ?");
-    params.push(description);
-  }
-  if (image_path !== undefined) {
-    cols.push("banner_image = ?");
-    params.push(image_path);
-  }
-  if (category_id !== undefined) {
-    cols.push("category_id = ?");
-    params.push(category_id === null ? null : Number(category_id));
-  }
-  if (product_id !== undefined) {
-    cols.push("product_id = ?");
-    params.push(product_id === null ? null : Number(product_id));
-  }
-  if (updated_by !== undefined) {
-    cols.push("updated_by = ?");
-    params.push(updated_by);
-  }
-  if (updated_at !== undefined) {
-    cols.push("updated_at = ?");
-    params.push(updated_at);
-  }
+    // Fallback: ensure minimum required fields
+    if (cols.length === 0) {
+        throw new Error('No columns to insert');
+    }
 
-  if (cols.length === 0) throw new Error("No fields provided to update");
-
-  const sql = `
-    UPDATE bh_banner 
-    SET ${cols.join(", ")} 
-    WHERE banner_id = ?
+    const Query = `
+    INSERT INTO bh_banner (${cols.map(c => `\`${c}\``).join(', ')})
+    VALUES (${vals.join(', ')})
   `;
-  params.push(banner_id);
 
-  const result = await query(sql, params);
-  return result;
+    // Execute
+    const result = await query(Query, params);
+
+    // If using mysql2, result.insertId contains the new PK
+    // return it for convenience
+    return result;
 };
