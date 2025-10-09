@@ -69,3 +69,41 @@ module.exports.AddBanner = async ({
     // return it for convenience
     return result;
 };
+// Insert banner (flexible fields)
+module.exports.AddBanner = async ({
+  banner_name,
+  banner_heading,
+  description,
+  image_path,
+  banner_priority = 0,
+  category_id = null,
+  product_id = null,
+  created_by = null
+}) => {
+  try {
+    const cols = [];
+    const vals = [];
+    const params = [];
+
+    if (banner_name !== undefined) { cols.push('banner_name'); vals.push('?'); params.push(banner_name); }
+    if (banner_heading !== undefined) { cols.push('banner_heading'); vals.push('?'); params.push(banner_heading); }
+    if (description !== undefined) { cols.push('description'); vals.push('?'); params.push(description); }
+    if (image_path !== undefined) { cols.push('banner_image'); vals.push('?'); params.push(image_path); }
+    if (banner_priority !== undefined && banner_priority !== null) {
+      cols.push('banner_priority'); vals.push('?'); params.push(Number(banner_priority));
+    }
+    if (category_id !== undefined) { cols.push('category_id'); vals.push('?'); params.push(category_id === null ? null : Number(category_id)); }
+    if (product_id !== undefined) { cols.push('product_id'); vals.push('?'); params.push(product_id === null ? null : Number(product_id)); }
+    if (created_by !== undefined) { cols.push('created_by'); vals.push('?'); params.push(created_by); }
+
+    cols.push('created_at'); vals.push('NOW()');
+    const sql = `
+      INSERT INTO bh_banner (${cols.map(c => `\`${c}\``).join(', ')})
+      VALUES (${vals.join(', ')})
+    `;
+    return await query(sql, params);
+  } catch (err) {
+    err.message = `AddBanner failed: ${err.message}`;
+    throw err;
+  }
+};
