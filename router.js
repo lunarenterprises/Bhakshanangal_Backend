@@ -166,6 +166,10 @@ route.post("/banner/create", verifyToken, AddBanner)
 var { BannerList } = require('./controller/bannerlist')
 route.post("/banner/list", BannerList)
 
+var {EditBanner} = require('./controller/editbanner');
+route.post("/banner/edit", EditBanner)
+
+
 var { DeleteBanner } = require("./controller/deletebanner");
 // route.post("/delete-banner", verifyToken, authorize('admin'), DeleteBanner)
 route.post("/delete-banner", verifyToken, DeleteBanner)

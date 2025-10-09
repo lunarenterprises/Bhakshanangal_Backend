@@ -4,6 +4,8 @@ const query = util.promisify(db.query).bind(db);
 
 // ✅ Check if user is admin
 module.exports.CheckAdminQuery = async (user_id) => {
+  if (!user_id) return [];
+
   const sql = `
     SELECT * 
     FROM bh_user 
@@ -22,56 +24,56 @@ module.exports.GetBannerById = async (banner_id) => {
   return data;
 };
 
-// ✅ Update banner by ID (similar to AddBanner insert style)
+// ✅ Update banner by ID
 module.exports.UpdateBanner = async ({
   banner_id,
   banner_name,
   description,
   image_path,
-  category_id = null,
-  product_id = null,
+  category_id,
+  product_id,
   updated_by,
   updated_at,
 }) => {
-  if (!banner_id) throw new Error("banner_id is required");
+  if (!banner_id) throw new Error("banner_id is required for update");
 
-  const cols = [];
+  const updates = [];
   const params = [];
 
   if (banner_name !== undefined) {
-    cols.push("banner_name = ?");
+    updates.push("banner_name = ?");
     params.push(banner_name);
   }
   if (description !== undefined) {
-    cols.push("description = ?");
+    updates.push("description = ?");
     params.push(description);
   }
   if (image_path !== undefined) {
-    cols.push("banner_image = ?");
+    updates.push("banner_image = ?");
     params.push(image_path);
   }
   if (category_id !== undefined) {
-    cols.push("category_id = ?");
+    updates.push("category_id = ?");
     params.push(category_id === null ? null : Number(category_id));
   }
   if (product_id !== undefined) {
-    cols.push("product_id = ?");
+    updates.push("product_id = ?");
     params.push(product_id === null ? null : Number(product_id));
   }
   if (updated_by !== undefined) {
-    cols.push("updated_by = ?");
+    updates.push("updated_by = ?");
     params.push(updated_by);
   }
   if (updated_at !== undefined) {
-    cols.push("updated_at = ?");
+    updates.push("updated_at = ?");
     params.push(updated_at);
   }
 
-  if (cols.length === 0) throw new Error("No fields provided to update");
+  if (updates.length === 0) throw new Error("No fields provided to update");
 
   const sql = `
     UPDATE bh_banner 
-    SET ${cols.join(", ")} 
+    SET ${updates.join(", ")} 
     WHERE banner_id = ?
   `;
   params.push(banner_id);
