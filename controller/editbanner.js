@@ -65,19 +65,10 @@ module.exports.EditBanner = async (req, res) => {
       // Prepare update data
       const updatedData = {
         banner_id,
-        banner_name: banner_heading
-          ? String(banner_heading).trim().toLowerCase()
-          : existingBanner[0].banner_name,
-        description: description
-          ? String(description).trim()
-          : existingBanner[0].description,
-        image_path: filePath,
-        category_id: category_id
-          ? Number(category_id)
-          : existingBanner[0].category_id,
-        product_id: product_id
-          ? Number(product_id)
-          : existingBanner[0].product_id,
+        banner_heading,
+        category_id,
+        product_id,
+        description
       };
 
       // Update banner
