@@ -32,8 +32,6 @@ module.exports.UpdateBanner = async ({
   image_path,
   category_id,
   product_id,
-  updated_by,
-  updated_at,
 }) => {
   if (!banner_id) throw new Error("banner_id is required for update");
 
@@ -59,14 +57,6 @@ module.exports.UpdateBanner = async ({
   if (product_id !== undefined) {
     updates.push("product_id = ?");
     params.push(product_id === null ? null : Number(product_id));
-  }
-  if (updated_by !== undefined) {
-    updates.push("updated_by = ?");
-    params.push(updated_by);
-  }
-  if (updated_at !== undefined) {
-    updates.push("updated_at = ?");
-    params.push(updated_at);
   }
 
   if (updates.length === 0) throw new Error("No fields provided to update");

@@ -6,8 +6,6 @@ const moment = require("moment");
 const Uploads = upload.array("image");
 
 module.exports.EditBanner = async (req, res) => {
-  console.log(req, "reqq");
-
   try {
     // Run upload middleware
     Uploads(req, res, async (err) => {
@@ -58,15 +56,6 @@ module.exports.EditBanner = async (req, res) => {
         });
       }
 
-      // Fetch existing banner
-      const existingBanner = await model.GetBannerById(banner_id);
-      if (!existingBanner || existingBanner.length === 0) {
-        return res.send({
-          result: false,
-          message: "Banner not found.",
-        });
-      }
-
       // Handle new image (or keep old one)
       const filePath =
         req.files && req.files.length > 0
@@ -89,8 +78,6 @@ module.exports.EditBanner = async (req, res) => {
         product_id: product_id
           ? Number(product_id)
           : existingBanner[0].product_id,
-        updated_by: user_id,
-        updated_at: moment().format("YYYY-MM-DD HH:mm:ss"),
       };
 
       // Update banner
