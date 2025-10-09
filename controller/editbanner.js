@@ -15,13 +15,13 @@ module.exports.EditBanner = async (req, res) => {
       }
 
       // Get user_id from JWT or fallback header
-      // const user_id = (req?.user && req.user.user_id) ? req.user.user_id : (req?.headers?.user_id || null);
-      // if (!user_id) {
-      //   return res.status(401).send({
-      //     result: false,
-      //     message: "User ID is required"
-      //   });
-      // }
+      const user_id = (req?.user && req.user.user_id) ? req.user.user_id : (req?.headers?.user_id || null);
+      if (!user_id) {
+        return res.status(401).send({
+          result: false,
+          message: "User ID is required"
+        });
+      }
 
       // Language pack
       const lang = req.body.language || "en";
@@ -46,13 +46,13 @@ module.exports.EditBanner = async (req, res) => {
       }
 
       // Admin check
-      // const CheckAdmin = await model.CheckAdminQuery(user_id);
-      // if (!Array.isArray(CheckAdmin) || CheckAdmin.length === 0) {
-      //   return res.send({
-      //     result: false,
-      //     message: language.Try_with_admin_level_Account || "Try with admin level Account"
-      //   });
-      // }
+      const CheckAdmin = await model.CheckAdminQuery(user_id);
+      if (!Array.isArray(CheckAdmin) || CheckAdmin.length === 0) {
+        return res.send({
+          result: false,
+          message: language.Try_with_admin_level_Account || "Try with admin level Account"
+        });
+      }
 
       // Fetch existing banner
       const existingRows = await model.GetBannerById(Number(banner_id));
@@ -80,12 +80,6 @@ module.exports.EditBanner = async (req, res) => {
         category_id: category_id !== undefined ? (category_id ? Number(category_id) : null) : undefined,
         product_id: product_id !== undefined ? (product_id ? Number(product_id) : null) : undefined
       };
-
-      // Optional: keep banner_name normalized in sync when heading changes
-      // If business rule requires this, uncomment:
-      // if (banner_heading !== undefined) {
-      //   payload.banner_name = String(banner_heading).trim().toLowerCase();
-      // }
 
       // Perform update
       const result = await model.UpdateBanner(Number(banner_id), payload);
