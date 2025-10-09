@@ -23,51 +23,43 @@ module.exports.GetBannerById = async (banner_id) => {
   const data = await query(sql, [banner_id]);
   return data;
 };
+// Update banner (partial update)
+module.exports.UpdateBanner = async (banner_id, payload = {}) => {
+  try {
+    const sets = [];
+    const params = [];
 
-// ✅ Update banner by ID
-module.exports.UpdateBanner = async ({
-  banner_id,
-  banner_name,
-  description,
-  image_path,
-  category_id,
-  product_id,
-}) => {
-  if (!banner_id) throw new Error("banner_id is required for update");
+    // map request keys => DB columns
+    const map = {
+      banner_heading: 'banner_heading',
+      description: 'description',
+      image_path: 'banner_image',
+      category_id: 'category_id',
+      product_id: 'product_id'
+    };
 
-  const updates = [];
-  const params = [];
+    Object.keys(map).forEach(k => {
+      if (payload[k] !== undefined) {
+        sets.push(`\`${map[k]}\` = ?`);
+        if (k === 'banner_priority') params.push(Number(payload[k]));
+        else if (k === 'category_id' || k === 'product_id') params.push(payload[k] === null ? null : Number(payload[k]));
+        else params.push(payload[k]);
+      }
+    });
 
-  if (banner_name !== undefined) {
-    updates.push("banner_name = ?");
-    params.push(banner_name);
+    if (sets.length === 0) return { affectedRows: 0 };
+
+    sets.push('`updated_at` = NOW()');
+
+    const sql = `
+      UPDATE bh_banner
+      SET ${sets.join(', ')}
+      WHERE banner_id = ?
+    `;
+    params.push(banner_id);
+    return await query(sql, params);
+  } catch (err) {
+    err.message = `UpdateBanner failed: ${err.message}`;
+    throw err;
   }
-  if (description !== undefined) {
-    updates.push("description = ?");
-    params.push(description);
-  }
-  if (image_path !== undefined) {
-    updates.push("banner_image = ?");
-    params.push(image_path);
-  }
-  if (category_id !== undefined) {
-    updates.push("category_id = ?");
-    params.push(category_id === null ? null : Number(category_id));
-  }
-  if (product_id !== undefined) {
-    updates.push("product_id = ?");
-    params.push(product_id === null ? null : Number(product_id));
-  }
-
-  if (updates.length === 0) throw new Error("No fields provided to update");
-
-  const sql = `
-    UPDATE bh_banner 
-    SET ${updates.join(", ")} 
-    WHERE banner_id = ?
-  `;
-  params.push(banner_id);
-
-  const result = await query(sql, params);
-  return result;
 };
