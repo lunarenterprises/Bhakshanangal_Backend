@@ -121,6 +121,7 @@ module.exports.GetSubCategory = async (
 
     let Query = `
       SELECT 
+          ROW_NUMBER() OVER (ORDER BY sc.sc_id DESC) + ? AS sn,
           sc.sc_id, 
           sc.sc_category_id,
           sct.sct_language_name AS sc_name, 
@@ -139,7 +140,7 @@ module.exports.GetSubCategory = async (
         AND l.language_code = ?
     `;
 
-    const params = [lang];
+    const params = [Number(offset), lang];
 
     if (statusClause) {
       Query += ` AND ${statusClause}`;
@@ -154,6 +155,8 @@ module.exports.GetSubCategory = async (
       Query += ` AND sct.sct_language_name LIKE ?`;
       params.push(`%${search}%`);
     }
+
+    Query += ` ORDER BY sc.sc_id DESC`;
 
     if (limit && Number(limit) > 0) {
       Query += ` LIMIT ? OFFSET ?`;
