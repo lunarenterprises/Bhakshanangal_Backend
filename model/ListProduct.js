@@ -144,12 +144,15 @@ module.exports.GetAllProducts = async ({
 
     let Query = `
     SELECT
+      (@row_number := @row_number + 1) AS sn,
       p.*,
       pc.*,
       ts.*,
       psc.sc_id AS sub_category_id,
       psc.sc_name AS sub_category_name
-    FROM bh_products p
+    FROM 
+      (SELECT @row_number := ?) AS init,
+      bh_products p
     LEFT JOIN bh_product_categories pc 
       ON pc.category_id = p.category_id
      AND pc.category_status = 'active'
@@ -161,7 +164,7 @@ module.exports.GetAllProducts = async ({
     WHERE 1=1
   `;
 
-    const params = [];
+    const params = [pageOffset];
 
     // Product visibility (optional based on role)
     if (productStatusClause) {
