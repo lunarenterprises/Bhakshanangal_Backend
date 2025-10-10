@@ -14,4 +14,4 @@ const generateSku = (product_id) => {
     const randomStr = generateRandomString(4);
     return `SKU-${product_id}-${timestamp}${randomStr}`;
 };
-module.exports = { generateSku };
+module.exports = generateSku;
