@@ -17,7 +17,8 @@ module.exports.AddProducts = async (req, res) => {
       sub_category,
       material,
       how_to_use,
-      tax_value_id,
+      tax_value_ids, // now array of tax IDs
+      infoArray,     // now array of {infoLabel, info}
       shipping = false,
       cod = false,
       refund = false,
@@ -28,13 +29,14 @@ module.exports.AddProducts = async (req, res) => {
 
     const language = await languages(lang);
 
-    if (!product_name || !product_description || !category) {
+    if (!product_name || !product_description || !category || !Array.isArray(tax_value_ids) || tax_value_ids.length === 0 || !Array.isArray(infoArray)) {
       return res.send({
         result: false,
         message: language.insufficient_parameters,
       });
     }
 
+    // Continue validation as before; you can modify these to check all tax_value_ids if needed
     const CheckProduct = await model.CheckProductQuery(product_name);
     if (CheckProduct.length > 0) {
       return res.send({
@@ -42,7 +44,6 @@ module.exports.AddProducts = async (req, res) => {
         message: language.product_already_exists,
       });
     }
-
     const checkCategory = await model.CheckCategory(category);
     if (checkCategory.length === 0) {
       return res.send({
@@ -58,14 +59,7 @@ module.exports.AddProducts = async (req, res) => {
       });
     }
 
-    const checkTax = await model.CheckTax(tax_value_id);
-    if (checkTax.length === 0) {
-      return res.send({
-        result: false,
-        message: "Tax details not found",
-      });
-    }
-    // Helper function to translate text into multiple languages
+    // Helper function for translation remains the same...
     const translateText = async (text) => {
       const ar = await translatte(text, { to: "ar" });
       const fr = await translatte(text, { to: "fr" });
@@ -80,14 +74,13 @@ module.exports.AddProducts = async (req, res) => {
       };
     };
 
-    // Translate all fields
+    // Prepare and translate product info as before
     const productNameTranslations = await translateText(product_name);
     const productDescriptionTranslations = await translateText(product_description);
     const materialTranslations = material ? await translateText(material) : null;
     const howToUseTranslations = how_to_use ? await translateText(how_to_use) : null;
 
-    // Prepare array for insertion
-    const array = [
+    const translationsArray = [
       { lannum: 0, lancod: "en", langP: productNameTranslations.en, langD: productDescriptionTranslations.en, material: materialTranslations?.en, how_to_use: howToUseTranslations?.en },
       { lannum: 1, lancod: "ar", langP: productNameTranslations.ar, langD: productDescriptionTranslations.ar, material: materialTranslations?.ar, how_to_use: howToUseTranslations?.ar },
       { lannum: 2, lancod: "fr", langP: productNameTranslations.fr, langD: productDescriptionTranslations.fr, material: materialTranslations?.fr, how_to_use: howToUseTranslations?.fr },
@@ -95,10 +88,10 @@ module.exports.AddProducts = async (req, res) => {
       { lannum: 4, lancod: "ml", langP: productNameTranslations.ml, langD: productDescriptionTranslations.ml, material: materialTranslations?.ml, how_to_use: howToUseTranslations?.ml },
     ];
 
+    // Insert product
     const Product_insert = await model.AddProduct(
       category,
       sub_category,
-      tax_value_id,
       shipping,
       cod,
       refund,
@@ -107,7 +100,8 @@ module.exports.AddProducts = async (req, res) => {
     );
 
     if (Product_insert.affectedRows > 0) {
-      array.forEach(async (el) => {
+      // Insert translations
+      for (const el of translationsArray) {
         await model.AddTranslatedProducts(
           Product_insert.insertId,
           el.lannum,
@@ -116,23 +110,26 @@ module.exports.AddProducts = async (req, res) => {
           el.material,
           el.how_to_use
         );
-      });
+      }
+
+      // Loop and insert into bh_product_tax for each tax ID
+      for (const tax_id of tax_value_ids) {
+        await model.InsertProductTax(Product_insert.insertId, tax_id);
+      }
+
+      // Loop and insert product info
+      for (const infoObj of infoArray) {
+        if (infoObj && infoObj.infoLabel && infoObj.info) {
+          await model.InsertProductInfo(Product_insert.insertId, infoObj.infoLabel, infoObj.info);
+        }
+      }
+
       return res.send({
         result: true,
         message: language.product_added_success,
         product_id: Product_insert.insertId,
-        product_name: product_name,
-        category_id: category,
-        category_name: checkCategory[0]?.category_name,
-        sub_category_id: sub_category,
-        category_name: checkSubCategory[0]?.sc_name,
-        tx_schedule_id: checkTax[0]?.tx_schedule_id,
-        tx_schedule_name: checkTax[0]?.tx_schedule_name,
-        tx_schedule_tax: checkTax[0]?.tx_schedule_tax,
-        tx_schedule_cgst: checkTax[0]?.tx_schedule_cgst,
-        tx_schedule_igst: checkTax[0]?.tx_schedule_igst,
-        tx_schedule_sgst: checkTax[0]?.tx_schedule_sgst,
-        tx_schedule_vat: checkTax[0]?.tx_schedule_vat,
+        infoArray,
+        tax_value_ids
       });
     } else {
       return res.send({

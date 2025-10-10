@@ -53,7 +53,7 @@ module.exports.CheckTax = async (tax_value_id) => {
 
 module.exports.AddProduct = async (
   category_id,
-  sub_category, tax_value_id,
+  sub_category,
   shipping,
   cash_on_delivery,
   refundable,
@@ -61,10 +61,10 @@ module.exports.AddProduct = async (
   new_arrival
 ) => {
   try {
-    const Query = `insert into bh_products(category_id,sub_category_id,tax_value_id,shipping,cash_on_delivery,refundable,free_delivery,new_arrival)values(?,?,?,?,?,?,?,?)`;
+    const Query = `insert into bh_products(category_id,sub_category_id,shipping,cash_on_delivery,refundable,free_delivery,new_arrival)values(?,?,?,?,?,?,?,?)`;
     const data = await query(Query, [
       category_id,
-      sub_category, tax_value_id,
+      sub_category,
       shipping,
       cash_on_delivery,
       refundable,
@@ -74,6 +74,27 @@ module.exports.AddProduct = async (
     return data;
   } catch (error) {
     throw error;
+  }
+};
+// Insert into bh_product_tax
+module.exports.InsertProductTax = async (product_id, tax_value_id) => {
+  try {
+    const sql = `INSERT INTO bh_product_tax (product_id, tax_value_id) VALUES (?, ?)`;
+    return await query(sql, [product_id, tax_value_id]);
+  } catch (err) {
+    err.message = `InsertProductTax failed: ${err.message}`;
+    throw err;
+  }
+};
+
+// Insert into bh_product_info
+module.exports.InsertProductInfo = async (product_id, infoLabel, info) => {
+  try {
+    const sql = `INSERT INTO bh_product_info (product_id, info_label, info_value) VALUES (?, ?, ?)`;
+    return await query(sql, [product_id, infoLabel, info]);
+  } catch (err) {
+    err.message = `InsertProductInfo failed: ${err.message}`;
+    throw err;
   }
 };
 
