@@ -8,7 +8,8 @@ module.exports.CheckUserQuery = async (user_id) => {
   return data;
 };
 
-module.exports.GetCategory = async (lang, statusKey = 'all', offset = 0, limit = 20, search = '') => {
+module.exports.GetCategory = async (lang, statusKey, offset = 0, limit = 20, search = '') => {
+  console.log("Status Key: ", lang);
   // Whitelist status keys to safe SQL fragments
   const allowedStatusMap = {
     active: 'pc.category_status = 1',
@@ -105,7 +106,7 @@ module.exports.GetCategoryCount = async (lang, statusKey = 'all', search = '') =
 };
 module.exports.GetSubCategory = async (
   lang,
-  statusCondition = 'all',
+  statusCondition,
   category_id = null,
   search = '',
   offset = 0,

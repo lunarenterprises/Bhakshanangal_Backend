@@ -7,7 +7,7 @@ const util = require('util')
 const { upload } = require("../components/product_uploader");
 const moment = require("moment");
 var formidable = require("formidable");
-const { skuGenerator } = require('../util/skuGenerator')
+const skuGenerator = require('../util/skuGenerator').default
 module.exports.AddProducts = async (req, res) => {
   try {
     const {
@@ -223,7 +223,7 @@ module.exports.AddProductVariants = async (req, res) => {
           message: "Product not found",
         });
       }
-      let sku = skuGenerator(product_id)
+      let sku = generateSku(product_id);
       // Add product variant
       const created = await model.AddProductVariant(
         product_id,
