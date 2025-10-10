@@ -325,3 +325,35 @@ module.exports.DeleteAllUserFilesQuery = async (variant_id) => {
     throw error;
   }
 }
+module.exports.GetVariantsByProductId = async (product_id) => {
+  try {
+    const sql = `
+     SELECT 
+  pv.bpv_id,
+  pv.bpv_product_id,
+  pv.bpv_sku,
+  pv.bpv_size,
+  pv.bpv_unit,
+  pv.bpv_stock,
+  pv.bpv_price,
+  pv.bpv_discount,
+  pv.bpv_selling_price,
+  pv.bpv_gst_price,
+  pv.bpv_vat_price,
+  u.unit_name,
+  GROUP_CONCAT(pvi.pv_file) AS images
+FROM bh_product_variants pv
+LEFT JOIN bh_product_variant_images pvi ON pv.bpv_id = pvi.pv_variant_id
+LEFT JOIN units u ON pv.bpv_unit = u.unit_id  
+WHERE pv.bpv_product_id = ?
+GROUP BY pv.bpv_id
+ORDER BY pv.bpv_id DESC;
+
+    `;
+    const rows = await query(sql, [product_id]);
+    return rows;
+  } catch (err) {
+    err.message = `GetVariantsByProductId failed: ${err.message}`;
+    throw err;
+  }
+};

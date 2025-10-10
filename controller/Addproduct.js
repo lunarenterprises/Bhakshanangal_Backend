@@ -517,3 +517,38 @@ module.exports.EditProductVariant = async (req, res) => {
     });
   }
 };
+module.exports.GetVariantsByProductId = async (req, res) => {
+  try {
+    const { product_id } = req.body;
+    if (!product_id) {
+      return res.send({
+        result: false,
+        message: "product_id parameter is required",
+      });
+    }
+
+    const variants = await model.GetVariantsByProductId(Number(product_id));
+    if (!variants || variants.length === 0) {
+      return res.send({
+        result: false,
+        message: "No variants found for the given product_id",
+      });
+    }
+
+    // Parse images string into arrays per variant
+    const formattedVariants = variants.map(v => ({
+      ...v,
+      images: v.images ? v.images.split(',') : []
+    }));
+
+    return res.send({
+      result: true,
+      data: formattedVariants,
+    });
+  } catch (error) {
+    return res.send({
+      result: false,
+      message: error.message,
+    });
+  }
+};
