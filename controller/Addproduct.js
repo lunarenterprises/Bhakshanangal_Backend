@@ -7,7 +7,6 @@ const util = require('util')
 const { upload } = require("../components/product_uploader");
 const moment = require("moment");
 var formidable = require("formidable");
-
 module.exports.AddProducts = async (req, res) => {
   try {
     const {
@@ -17,8 +16,8 @@ module.exports.AddProducts = async (req, res) => {
       sub_category,
       material,
       how_to_use,
-      tax_value_ids, // now array of tax IDs
-      infoArray,     // now array of {infoLabel, info}
+      tax_value_ids, // array of tax IDs
+      infoArray,     // array of {infoLabel, info}
       shipping = false,
       cod = false,
       refund = false,
@@ -29,14 +28,18 @@ module.exports.AddProducts = async (req, res) => {
 
     const language = await languages(lang);
 
-    if (!product_name || !product_description || !category || !Array.isArray(tax_value_ids) || tax_value_ids.length === 0 || !Array.isArray(infoArray)) {
+    if (
+      !product_name || !product_description || !category ||
+      !Array.isArray(tax_value_ids) || tax_value_ids.length === 0 ||
+      !Array.isArray(infoArray)
+    ) {
       return res.send({
         result: false,
         message: language.insufficient_parameters,
       });
     }
 
-    // Continue validation as before; you can modify these to check all tax_value_ids if needed
+    // Validate existing data as before
     const CheckProduct = await model.CheckProductQuery(product_name);
     if (CheckProduct.length > 0) {
       return res.send({
@@ -59,7 +62,7 @@ module.exports.AddProducts = async (req, res) => {
       });
     }
 
-    // Helper function for translation remains the same...
+    // Translate helper unchanged
     const translateText = async (text) => {
       const ar = await translatte(text, { to: "ar" });
       const fr = await translatte(text, { to: "fr" });
@@ -74,7 +77,6 @@ module.exports.AddProducts = async (req, res) => {
       };
     };
 
-    // Prepare and translate product info as before
     const productNameTranslations = await translateText(product_name);
     const productDescriptionTranslations = await translateText(product_description);
     const materialTranslations = material ? await translateText(material) : null;
@@ -112,12 +114,19 @@ module.exports.AddProducts = async (req, res) => {
         );
       }
 
-      // Loop and insert into bh_product_tax for each tax ID
+      // Insert into bh_product_tax and gather detailed tax info for response
+      const taxDetails = [];
       for (const tax_id of tax_value_ids) {
         await model.InsertProductTax(Product_insert.insertId, tax_id);
+
+        // Fetch full tax detail for each tax_id
+        const taxDetail = await model.GetTaxDetailsById(tax_id);
+        if (taxDetail) {
+          taxDetails.push(taxDetail);
+        }
       }
 
-      // Loop and insert product info
+      // Insert product info records
       for (const infoObj of infoArray) {
         if (infoObj && infoObj.infoLabel && infoObj.info) {
           await model.InsertProductInfo(Product_insert.insertId, infoObj.infoLabel, infoObj.info);
@@ -128,8 +137,21 @@ module.exports.AddProducts = async (req, res) => {
         result: true,
         message: language.product_added_success,
         product_id: Product_insert.insertId,
+        product_name,
+        product_description,
+        category,
+        sub_category,
+        material,
+        how_to_use,
+        tax_value_ids,
+        taxDetails,    // full tax details array returned here
         infoArray,
-        tax_value_ids
+        shipping,
+        cod,
+        refund,
+        free_delivery,
+        new_arrival,
+        lang
       });
     } else {
       return res.send({
@@ -144,8 +166,6 @@ module.exports.AddProducts = async (req, res) => {
     });
   }
 };
-
-
 
 module.exports.AddProductVariants = async (req, res) => {
   try {
@@ -240,9 +260,6 @@ module.exports.AddProductVariants = async (req, res) => {
     });
   }
 };
-
-
-
 module.exports.EditProduct = async (req, res) => {
   try {
     const { product_id, product_name, product_description, category, shipping, cod, refund, free_delivery, new_arrival, lang = 'en' } = req.body
@@ -368,7 +385,6 @@ module.exports.EditProduct = async (req, res) => {
     return res.send({})
   }
 }
-
 module.exports.EditProductVariant = async (req, res) => {
   try {
     const form = new formidable.IncomingForm({ multiples: true });

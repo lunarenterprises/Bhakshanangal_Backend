@@ -86,6 +86,28 @@ module.exports.InsertProductTax = async (product_id, tax_value_id) => {
     throw err;
   }
 };
+module.exports.GetTaxDetailsById = async (tax_value_id) => {
+  try {
+    const sql = `
+      SELECT 
+        tx_schedule_id,
+        tx_schedule_name,
+        tx_schedule_tax,
+        tx_schedule_cgst,
+        tx_schedule_igst,
+        tx_schedule_sgst,
+        tx_schedule_vat
+      FROM tax_schedule
+      WHERE tx_schedule_id = ?
+      LIMIT 1
+    `;
+    const rows = await query(sql, [tax_value_id]);
+    return rows.length > 0 ? rows[0] : null;
+  } catch (err) {
+    err.message = `GetTaxDetailsById failed: ${err.message}`;
+    throw err;
+  }
+};
 
 // Insert into bh_product_info
 module.exports.InsertProductInfo = async (product_id, infoLabel, info) => {
