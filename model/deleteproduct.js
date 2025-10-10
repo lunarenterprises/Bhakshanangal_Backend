@@ -14,18 +14,18 @@ module.exports.CheckProduct = async (product_id) => {
     return data;
 };
 
-// module.exports.DeleteProduct = async(product_id)=>{
-//     var Query = `UPDATE bh_products
-//     SET product_status = 'removed'
-//     WHERE product_id = ?`;
-//     var data = query(Query,[product_id]);
-//     return data;
-// };
 
 module.exports.DeleteProduct = async (product_id) => {
-    let Query = `delete from bh_product where product_id=?`
-    return await query(Query, [product_id])
-}
+    try {
+        const Query = `DELETE FROM bh_products WHERE product_id = ?`;
+        const result = await query(Query, [product_id]);
+        return result;
+    } catch (err) {
+        err.message = `DeleteProduct failed: ${err.message}`;
+        throw err;
+    }
+};
+
 
 module.exports.DeleteAllVariantsOfProduct = async (product_id) => {
     let Query = `delete from bh_product_variants where bpv_product_id=?`
@@ -48,7 +48,7 @@ module.exports.CheckProductVariant = async (variant_id) => {
 }
 
 
-module.exports.CheckProductVariantImage=async(image_id)=>{
-    let Query=`select * from bh_product_variant_images where pv_id=?`
-    return await query(Query,[image_id])
+module.exports.CheckProductVariantImage = async (image_id) => {
+    let Query = `select * from bh_product_variant_images where pv_id=?`
+    return await query(Query, [image_id])
 }
