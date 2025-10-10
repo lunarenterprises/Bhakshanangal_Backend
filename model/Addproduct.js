@@ -61,7 +61,7 @@ module.exports.AddProduct = async (
   new_arrival
 ) => {
   try {
-    const Query = `insert into bh_products(category_id,sub_category_id,shipping,cash_on_delivery,refundable,free_delivery,new_arrival)values(?,?,?,?,?,?,?,?)`;
+    const Query = `INSERT INTO bh_products(category_id, sub_category_id, shipping, cash_on_delivery, refundable, free_delivery, new_arrival) VALUES (?, ?, ?, ?, ?, ?, ?)`;
     const data = await query(Query, [
       category_id,
       sub_category,
