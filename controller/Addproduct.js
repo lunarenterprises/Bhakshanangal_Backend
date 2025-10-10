@@ -188,14 +188,23 @@ module.exports.AddProductVariants = async (req, res) => {
         stock,
         price,
         discount,
+        selling_price,
+        gst_price,
+        vat_price,
         lang = "en",
       } = fields;
 
-      // 1️⃣ Validation
-      if (!product_id || !sku || !size || !unit || !stock || !price || !discount) {
+      // Validation
+      if (
+        !product_id || !sku || !size || !unit ||
+        stock === undefined || price === undefined ||
+        discount === undefined || selling_price === undefined ||
+        gst_price === undefined || vat_price === undefined
+      ) {
         return res.send({
           result: false,
-          message: "Product ID, SKU, size, unit, stock, price, and discount are required",
+          message:
+            "All fields product_id, sku, size, unit, stock, price, discount, selling_price, gst_price, vat_price are required",
         });
       }
 
@@ -206,7 +215,7 @@ module.exports.AddProductVariants = async (req, res) => {
         });
       }
 
-      // 2️⃣ Check if product exists
+      // Check product exists
       const checkProduct = await model.CheckProductWithId(product_id);
       if (checkProduct.length === 0) {
         return res.send({
@@ -215,8 +224,19 @@ module.exports.AddProductVariants = async (req, res) => {
         });
       }
 
-      // 3️⃣ Add product variant
-      const created = await model.AddProductVariant(product_id, sku, size, unit, stock, price, discount);
+      // Add product variant
+      const created = await model.AddProductVariant(
+        product_id,
+        sku,
+        Number(size),
+        unit,
+        Number(stock),
+        Number(price),
+        Number(discount),
+        Number(selling_price),
+        Number(gst_price),
+        Number(vat_price)
+      );
       if (created.affectedRows === 0) {
         return res.send({
           result: false,
@@ -232,7 +252,7 @@ module.exports.AddProductVariants = async (req, res) => {
         fs.mkdirSync(uploadDir, { recursive: true });
       }
 
-      // 4️⃣ Save images
+      // Save images one by one
       for (let image of imageArray) {
         const oldPath = image.filepath;
         const newPath = path.join(uploadDir, image.originalFilename);
@@ -247,10 +267,11 @@ module.exports.AddProductVariants = async (req, res) => {
         }
       }
 
-      // 5️⃣ Response
+      // Response success
       return res.send({
         result: true,
         message: "Product variant added successfully",
+        variant_id: variantId
       });
     });
   } catch (error) {

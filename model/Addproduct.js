@@ -201,14 +201,41 @@ module.exports.CheckProductWithId = async (product_id) => {
   }
 }
 
-module.exports.AddProductVariant = async (product_id, sku, size, unit, stock, price, discount) => {
+// Add a new product variant with all fields
+module.exports.AddProductVariant = async (
+  product_id,
+  sku,
+  size,
+  unit,
+  stock,
+  price,
+  discount,
+  selling_price,
+  gst_price,
+  vat_price
+) => {
   try {
-    let Query = `insert into bh_product_variants (bpv_product_id,bpv_sku,bpv_size,bpv_unit,bpv_stock,bpv_price,bpv_discount) values(?,?,?,?,?,?,?)`
-    return await query(Query, [product_id, sku, size, unit, stock, price, discount])
+    const sql = `
+      INSERT INTO bh_product_variants
+      (bpv_product_id, bpv_sku, bpv_size, bpv_unit, bpv_stock, bpv_price, bpv_discount, bpv_selling_price, bpv_gst_price, bpv_vat_price)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+    return await query(sql, [
+      product_id,
+      sku,
+      size,
+      unit,
+      stock,
+      price,
+      discount,
+      selling_price,
+      gst_price,
+      vat_price
+    ]);
   } catch (error) {
     throw error;
   }
-}
+};
 
 module.exports.UpdateProductVariant = async (updateString, variant_id) => {
   try {
