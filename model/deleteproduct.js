@@ -26,7 +26,6 @@ module.exports.DeleteProduct = async (product_id) => {
     }
 };
 
-
 module.exports.DeleteAllVariantsOfProduct = async (product_id) => {
     let Query = `delete from bh_product_variants where bpv_product_id=?`
     return await query(Query, [product_id])
