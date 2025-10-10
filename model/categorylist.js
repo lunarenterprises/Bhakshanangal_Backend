@@ -9,7 +9,7 @@ module.exports.CheckUserQuery = async (user_id) => {
 };
 
 module.exports.GetCategory = async (lang, statusKey, offset = 0, limit = 20, search = '') => {
-  console.log("Status Key: ", lang);
+
   // Whitelist status keys to safe SQL fragments
   const allowedStatusMap = {
     active: 'pc.category_status = 1',
@@ -54,7 +54,7 @@ module.exports.GetCategory = async (lang, statusKey, offset = 0, limit = 20, sea
     // For mysql2 .query use numbers; for .execute consider strings
     params.push(Number(limit), Number(offset || 0));
   }
-
+  console.log("Query: ", Query);
   const data = await query(Query, params);
   return data;
 };
@@ -137,7 +137,7 @@ module.exports.GetSubCategory = async (
          AND c.ct_language_id = sct.sct_language_id
       INNER JOIN bh_languages l 
           ON sct.sct_language_id = l.language_id
-      WHERE 1=1
+      WHERE 
         AND l.language_code = ?
     `;
 
