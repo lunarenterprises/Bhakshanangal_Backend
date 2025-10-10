@@ -7,6 +7,7 @@ const util = require('util')
 const { upload } = require("../components/product_uploader");
 const moment = require("moment");
 var formidable = require("formidable");
+const { skuGenerator } = require('../util/skuGenerator')
 module.exports.AddProducts = async (req, res) => {
   try {
     const {
@@ -182,7 +183,6 @@ module.exports.AddProductVariants = async (req, res) => {
 
       const {
         product_id,
-        sku,
         size,
         unit,
         stock,
@@ -196,7 +196,7 @@ module.exports.AddProductVariants = async (req, res) => {
 
       // Validation
       if (
-        !product_id || !sku || !size || !unit ||
+        !product_id || !size || !unit ||
         stock === undefined || price === undefined ||
         discount === undefined || selling_price === undefined ||
         gst_price === undefined || vat_price === undefined
@@ -223,7 +223,7 @@ module.exports.AddProductVariants = async (req, res) => {
           message: "Product not found",
         });
       }
-
+      let sku = skuGenerator(product_id)
       // Add product variant
       const created = await model.AddProductVariant(
         product_id,
