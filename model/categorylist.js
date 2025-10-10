@@ -19,6 +19,7 @@ module.exports.GetCategory = async (lang, statusKey = 'all', offset = 0, limit =
 
   let Query = `
     SELECT 
+      ROW_NUMBER() OVER (ORDER BY pc.category_id DESC) + ? AS sn,
       pc.category_id,
       ct.ct_language_name AS category_name,
       pc.category_image,
@@ -30,7 +31,7 @@ module.exports.GetCategory = async (lang, statusKey = 'all', offset = 0, limit =
       AND l.language_code = ?
   `;
 
-  const params = [lang];
+  const params = [Number(offset), lang];
 
   // Optional status filter
   if (statusClause) {
