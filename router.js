@@ -39,7 +39,7 @@ route.post("/addproduct", verifyToken, authorize('admin'), AddProducts);
 route.post("/product/addvariant", verifyToken, authorize('admin'), AddProductVariants);
 route.post("/editproduct", verifyToken, EditProduct);
 route.post("/product/editvariant", verifyToken, EditProductVariant);
-route.post("/product/variant/id", verifyToken, GetVariantsByProductId);
+route.post("/product/variant/id", GetVariantsByProductId);
 
 var { AddCategory, EditCategory, AddSubCategory, EditSubCategory } = require("./controller/AddCategory");
 // route.post("/add-category", verifyToken, authorize('admin'), AddCategory)
