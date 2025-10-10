@@ -34,11 +34,15 @@ var { RemoveAddress } = require("./controller/removeAddress");
 // route.post("/remove-address", verifyToken, authorize('user'), RemoveAddress);
 route.post("/remove-address", verifyToken, RemoveAddress);
 
-var { AddProducts, AddProductVariants, EditProduct, EditProductVariant } = require("./controller/Addproduct");
+var { AddProducts, AddProductVariants, EditProduct, EditProductVariant, GetVariantsByProductId, GetProductByIdWithDetails } = require("./controller/Addproduct");
 route.post("/addproduct", verifyToken, authorize('admin'), AddProducts);
 route.post("/product/addvariant", verifyToken, authorize('admin'), AddProductVariants);
 route.post("/editproduct", verifyToken, EditProduct);
 route.post("/product/editvariant", verifyToken, EditProductVariant);
+route.post("/product/id", GetProductByIdWithDetails);
+route.post("/product/variant/id", GetVariantsByProductId);
+
+
 
 var { AddCategory, EditCategory, AddSubCategory, EditSubCategory } = require("./controller/AddCategory");
 // route.post("/add-category", verifyToken, authorize('admin'), AddCategory)
@@ -165,6 +169,10 @@ route.post("/banner/create", verifyToken, AddBanner)
 
 var { BannerList } = require('./controller/bannerlist')
 route.post("/banner/list", BannerList)
+
+var { EditBanner } = require('./controller/editbanner');
+route.post("/banner/edit", EditBanner)
+
 
 var { DeleteBanner } = require("./controller/deletebanner");
 // route.post("/delete-banner", verifyToken, authorize('admin'), DeleteBanner)

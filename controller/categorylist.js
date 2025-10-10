@@ -4,32 +4,20 @@ var { languages } = require('../languages/languageFunc');
 module.exports.CategoryList = async (req, res) => {
     try {
         const lang = req.body.language || 'en';
-        let { page = 1, limit = 20, search = '' } = req.body;
-
+        let { page = 1, limit = 20, search = '', statusKey } = req.body;
         // Make role optional (no crash if req.user missing)
         const role = (req.user && req.user.role) ? req.user.role : null; // optional role
-
         // Ensure integers with sane fallbacks
         page = parseInt(page, 10) || 1;
         limit = parseInt(limit, 10) || 20;
         const offset = (page - 1) * limit;
-
-        // Map role to a status key; anonymous or non-user roles see all by default
-        // Only standard end-user role is restricted to active
-        let statusKey = 'all';
-        if (role === 'user') statusKey = 'active';
-
         const language = await languages(lang);
-
         // Get total count using same filters (lang, statusKey, search); no LIMIT/OFFSET
         const totalRows = await model.GetCategoryCount(lang, statusKey, search);
-
         // Get paginated list using same filters and ORDER BY for stable pagination
         const categories = await model.GetCategory(lang, statusKey, offset, limit, search);
-
         const totalCount = totalRows?.[0]?.total || 0;
         const totalPage = Math.ceil(totalCount / limit);
-
         // Attach product count
         const data = await Promise.all(categories.map(async (el) => {
             const count = await model.GetProductCategoryCount(el.category_id);
@@ -38,7 +26,6 @@ module.exports.CategoryList = async (req, res) => {
                 product_count: count.length
             };
         }));
-
         if (data.length > 0) {
             return res.send({
                 result: true,
@@ -61,13 +48,10 @@ module.exports.CategoryList = async (req, res) => {
         });
     }
 };
-
-
-
 module.exports.SubCategoryList = async (req, res) => {
     try {
         const lang = req.body.language || 'en';
-        let { category_id, page = 1, limit = 20, search = '' } = req.body;
+        let { category_id, page = 1, limit = 20, search = '', statusKey } = req.body;
         // Make role optional; default to 'guest' (no privileged data assumed)
         const role = (req.user && req.user.role) ? req.user.role : 'guest';
 
@@ -78,7 +62,6 @@ module.exports.SubCategoryList = async (req, res) => {
         // Map role -> status filter without injecting raw SQL
         // Only customers/guests see active items by default
         // Admins/managers can see all
-        let statusKey = 'all';
         if (role === 'user' || role === 'guest') {
             statusKey = 'active';
         }

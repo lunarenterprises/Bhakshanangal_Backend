@@ -1,6 +1,4 @@
 var model = require('../model/unit');
-
-
 module.exports.AddUnit = async (req, res) => {
     try {
         const { unit_id, unit_name } = req.body;
@@ -60,8 +58,6 @@ module.exports.AddUnit = async (req, res) => {
         });
     }
 };
-
-
 module.exports.listUnit = async (req, res) => {
     try {
 

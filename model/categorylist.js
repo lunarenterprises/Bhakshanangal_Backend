@@ -8,7 +8,8 @@ module.exports.CheckUserQuery = async (user_id) => {
   return data;
 };
 
-module.exports.GetCategory = async (lang, statusKey = 'all', offset = 0, limit = 20, search = '') => {
+module.exports.GetCategory = async (lang, statusKey, offset = 0, limit = 20, search = '') => {
+
   // Whitelist status keys to safe SQL fragments
   const allowedStatusMap = {
     active: 'pc.category_status = 1',
@@ -19,6 +20,7 @@ module.exports.GetCategory = async (lang, statusKey = 'all', offset = 0, limit =
 
   let Query = `
     SELECT 
+      ROW_NUMBER() OVER (ORDER BY pc.category_id DESC) + ? AS sn,
       pc.category_id,
       ct.ct_language_name AS category_name,
       pc.category_image,
@@ -30,7 +32,7 @@ module.exports.GetCategory = async (lang, statusKey = 'all', offset = 0, limit =
       AND l.language_code = ?
   `;
 
-  const params = [lang];
+  const params = [Number(offset), lang];
 
   // Optional status filter
   if (statusClause) {
@@ -52,7 +54,7 @@ module.exports.GetCategory = async (lang, statusKey = 'all', offset = 0, limit =
     // For mysql2 .query use numbers; for .execute consider strings
     params.push(Number(limit), Number(offset || 0));
   }
-
+  console.log("Query: ", Query);
   const data = await query(Query, params);
   return data;
 };
@@ -104,7 +106,7 @@ module.exports.GetCategoryCount = async (lang, statusKey = 'all', search = '') =
 };
 module.exports.GetSubCategory = async (
   lang,
-  statusCondition = 'all',
+  statusCondition,
   category_id = null,
   search = '',
   offset = 0,
@@ -120,6 +122,7 @@ module.exports.GetSubCategory = async (
 
     let Query = `
       SELECT 
+          ROW_NUMBER() OVER (ORDER BY sc.sc_id DESC) + ? AS sn,
           sc.sc_id, 
           sc.sc_category_id,
           sct.sct_language_name AS sc_name, 
@@ -134,11 +137,11 @@ module.exports.GetSubCategory = async (
          AND c.ct_language_id = sct.sct_language_id
       INNER JOIN bh_languages l 
           ON sct.sct_language_id = l.language_id
-      WHERE 1=1
+      WHERE 
         AND l.language_code = ?
     `;
 
-    const params = [lang];
+    const params = [Number(offset), lang];
 
     if (statusClause) {
       Query += ` AND ${statusClause}`;
@@ -153,6 +156,8 @@ module.exports.GetSubCategory = async (
       Query += ` AND sct.sct_language_name LIKE ?`;
       params.push(`%${search}%`);
     }
+
+    Query += ` ORDER BY sc.sc_id DESC`;
 
     if (limit && Number(limit) > 0) {
       Query += ` LIMIT ? OFFSET ?`;

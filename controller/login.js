@@ -15,19 +15,6 @@ module.exports.Login = async (req, res) => {
     let password = req.body.password;
     let email = req.body.email;
     let app_version = req.body.app_version;
-
-    // if (
-    //   !device_id ||
-    //   !device_os ||
-    //   !device_token ||
-    //   !password ||
-    //   !email
-    // ) {
-    //   return res.send({
-    //     result: false,
-    //     message: language.insufficient_parameters,
-    //   });
-    // }
     let CheckUser = await model.CheckUserQuery(email);
     if (CheckUser.length > 0) {
       if (CheckUser[0].user_email_verification == 'no') {
@@ -46,30 +33,6 @@ module.exports.Login = async (req, res) => {
           message: language.wrong_credential,
         });
       }
-      // let CheckUserapps = await model.CheckUserAppsQuery(
-      //   CheckUser[0].user_id,
-      //   device_id,
-      //   device_os
-      // );
-      // var api_key = null;
-      // if (CheckUserapps.length > 0) {
-      //   api_key = randtoken.generate(32);
-      //   await model.UpdateUserAppsQuery(
-      //     device_token,
-      //     api_key,
-      //     app_version,
-      //     CheckUserapps[0].user_apps_id)
-      // } else {
-      //   api_key = randtoken.generate(32);
-      //   await model.InsertUserAppsQuery(
-      //     device_id,
-      //     device_os,
-      //     device_token,
-      //     CheckUser[0].user_id,
-      //     api_key,
-      //     app_version
-      //   )
-      // }
       const token = GenerateToken({
         user_id: CheckUser[0].user_id,
         name: CheckUser[0].user_name,
