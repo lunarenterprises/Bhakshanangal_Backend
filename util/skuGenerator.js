@@ -8,10 +8,8 @@ const generateRandomString = (length = 5) => {
     return result;
 };
 
-const generateSku = (product_id) => {
+module.exports.generateSku = (product_id) => {
     const timestamp = Date.now().toString().slice(-5); // last 5 digits of timestamp
     const randomStr = generateRandomString(4);
     return `SKU-${product_id}-${timestamp}${randomStr}`;
 };
-
-export default generateSku;  // default export

@@ -7,7 +7,8 @@ const util = require('util')
 const { upload } = require("../components/product_uploader");
 const moment = require("moment");
 var formidable = require("formidable");
-const skuGenerator = require('../util/skuGenerator').default
+const { generateSku } = require('../util/skuGenerator');
+
 module.exports.AddProducts = async (req, res) => {
   try {
     const {
