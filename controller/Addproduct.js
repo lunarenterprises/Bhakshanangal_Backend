@@ -536,9 +536,11 @@ module.exports.GetProductByIdWithDetails = async (req, res) => {
       });
     }
 
-    // Transform to nested structure: product info with variants as array
+    // product-level fields from first row
     const productInfo = {
       product_id: rows[0].product_id,
+      product_name: rows[0].product_name,
+      description: rows[0].description,
       category_id: rows[0].category_id,
       sub_category_id: rows[0].sub_category_id,
       shipping: rows[0].shipping,
@@ -548,13 +550,15 @@ module.exports.GetProductByIdWithDetails = async (req, res) => {
       new_arrival: rows[0].new_arrival,
       tax_schedules: [],
       variants: [],
+      info: []
     };
 
     const taxSchedulesMap = new Map();
     const variantsMap = new Map();
+    const infoMap = new Map();
 
     for (let row of rows) {
-      // Tax schedules unique by tx_schedule_id
+      // tax schedules unique by tx_schedule_id
       if (row.tx_schedule_id && !taxSchedulesMap.has(row.tx_schedule_id)) {
         taxSchedulesMap.set(row.tx_schedule_id, {
           tx_schedule_id: row.tx_schedule_id,
@@ -567,7 +571,7 @@ module.exports.GetProductByIdWithDetails = async (req, res) => {
         });
       }
 
-      // Variants unique by bpv_id
+      // variants unique by bpv_id
       if (row.bpv_id && !variantsMap.has(row.bpv_id)) {
         variantsMap.set(row.bpv_id, {
           bpv_id: row.bpv_id,
@@ -584,10 +588,19 @@ module.exports.GetProductByIdWithDetails = async (req, res) => {
           images: row.variant_images ? row.variant_images.split(",") : [],
         });
       }
+
+      // product info unique by info_label to avoid duplicates
+      if (row.info_label && !infoMap.has(row.info_label)) {
+        infoMap.set(row.info_label, {
+          info_label: row.info_label,
+          info_value: row.info_value,
+        });
+      }
     }
 
     productInfo.tax_schedules = Array.from(taxSchedulesMap.values());
     productInfo.variants = Array.from(variantsMap.values());
+    productInfo.info = Array.from(infoMap.values());
 
     return res.send({
       result: true,

@@ -362,6 +362,8 @@ module.exports.GetProductByIdWithDetails = async (product_id) => {
   try {
     const sql = `
       SELECT 
+        t.product_name,
+        t.description,
         p.product_id,
         p.category_id,
         p.sub_category_id,
@@ -388,18 +390,23 @@ module.exports.GetProductByIdWithDetails = async (product_id) => {
         pv.bpv_selling_price,
         pv.bpv_gst_price,
         pv.bpv_vat_price,
-        GROUP_CONCAT(pvi.pv_file) AS variant_images
+        GROUP_CONCAT(DISTINCT pvi.pv_file) AS variant_images,
+        pi.info_label,
+        pi.info_value
       FROM bh_products p
+      LEFT JOIN bh_product_translations t ON p.product_id = t.product_id
       LEFT JOIN bh_product_tax pt ON p.product_id = pt.product_id
       LEFT JOIN tax_schedule ts ON pt.tax_value_id = ts.tx_schedule_id
       LEFT JOIN bh_product_variants pv ON p.product_id = pv.bpv_product_id
       LEFT JOIN bh_product_variant_images pvi ON pv.bpv_id = pvi.pv_variant_id
       LEFT JOIN units u ON pv.bpv_unit = u.unit_id
+      LEFT JOIN bh_product_info pi ON p.product_id = pi.product_id
       WHERE p.product_id = ?
-      GROUP BY p.product_id, pv.bpv_id
+      GROUP BY p.product_id, pv.bpv_id, pi.id
       ORDER BY pv.bpv_id DESC
     `;
-    return await query(sql, [product_id]);
+    const rows = await query(sql, [product_id]);
+    return rows;
   } catch (err) {
     err.message = `GetProductByIdWithDetails failed: ${err.message}`;
     throw err;
