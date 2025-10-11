@@ -34,14 +34,14 @@ var { RemoveAddress } = require("./controller/removeAddress");
 // route.post("/remove-address", verifyToken, authorize('user'), RemoveAddress);
 route.post("/remove-address", verifyToken, RemoveAddress);
 
-var { AddProducts, AddProductVariants, EditProduct, EditProductVariant, GetVariantsByProductId, GetProductByIdWithDetails } = require("./controller/Addproduct");
+var { AddProducts, AddProductVariants, EditProduct, EditProductVariant, GetVariantsByProductId, GetProductByIdWithDetails, GetVariantDetailsById } = require("./controller/Addproduct");
 route.post("/addproduct", verifyToken, authorize('admin'), AddProducts);
 route.post("/product/addvariant", verifyToken, authorize('admin'), AddProductVariants);
 route.post("/editproduct", verifyToken, EditProduct);
 route.post("/product/editvariant", verifyToken, EditProductVariant);
 route.post("/product/id", GetProductByIdWithDetails);
 route.post("/product/variant/id", GetVariantsByProductId);
-
+route.post("/variant/id", GetVariantDetailsById);
 
 
 var { AddCategory, EditCategory, AddSubCategory, EditSubCategory } = require("./controller/AddCategory");
@@ -309,9 +309,6 @@ route.post('/add/product-question', verifyToken, AddProductQuestion)
 route.post('/list/product-question-answer', verifyToken, ListProductQuestionAnswers)
 route.post('/add/product-answer', verifyToken, AddProductQuestionAnswer)
 route.post('/delete/product-question', verifyToken, authorize('admin'), DeleteProductQuestionAnswer)
-
-
-
 
 var { UpdateDeliveryDate } = require('./controller/UpdateDeliveryStatus')
 route.post('/update/delivery-status', UpdateDeliveryDate)

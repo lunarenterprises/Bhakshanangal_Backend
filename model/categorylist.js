@@ -9,14 +9,15 @@ module.exports.CheckUserQuery = async (user_id) => {
 };
 
 module.exports.GetCategory = async (lang, statusKey, offset = 0, limit = 20, search = '') => {
-
   // Whitelist status keys to safe SQL fragments
   const allowedStatusMap = {
     active: 'pc.category_status = 1',
     inactive: 'pc.category_status = 0',
     all: null
   };
-  const statusClause = allowedStatusMap[statusKey] || null;
+
+  // Validate statusKey, default to 'all' if invalid
+  const statusClause = allowedStatusMap.hasOwnProperty(statusKey) ? allowedStatusMap[statusKey] : null;
 
   let Query = `
     SELECT 
@@ -51,14 +52,13 @@ module.exports.GetCategory = async (lang, statusKey, offset = 0, limit = 20, sea
   // Pagination
   if (limit && Number(limit) > 0) {
     Query += ` LIMIT ? OFFSET ?`;
-    // For mysql2 .query use numbers; for .execute consider strings
     params.push(Number(limit), Number(offset || 0));
   }
+
   console.log("Query: ", Query);
   const data = await query(Query, params);
   return data;
 };
-
 
 module.exports.GetProductCategoryCount = async (category_id) => {
   var Query = `select * from bh_products where category_id = ?`;

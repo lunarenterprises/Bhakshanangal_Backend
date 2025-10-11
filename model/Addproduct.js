@@ -357,10 +357,13 @@ ORDER BY pv.bpv_id DESC;
     throw err;
   }
 };
+
 module.exports.GetProductByIdWithDetails = async (product_id) => {
   try {
     const sql = `
       SELECT 
+        t.product_name,
+        t.description,
         p.product_id,
         p.category_id,
         p.sub_category_id,
@@ -387,20 +390,75 @@ module.exports.GetProductByIdWithDetails = async (product_id) => {
         pv.bpv_selling_price,
         pv.bpv_gst_price,
         pv.bpv_vat_price,
-        GROUP_CONCAT(pvi.pv_file) AS variant_images
+        GROUP_CONCAT(DISTINCT pvi.pv_file) AS variant_images,
+        pi.info_label,
+        pi.info_value
       FROM bh_products p
+      LEFT JOIN bh_product_translations t ON p.product_id = t.product_id
       LEFT JOIN bh_product_tax pt ON p.product_id = pt.product_id
       LEFT JOIN tax_schedule ts ON pt.tax_value_id = ts.tx_schedule_id
       LEFT JOIN bh_product_variants pv ON p.product_id = pv.bpv_product_id
       LEFT JOIN bh_product_variant_images pvi ON pv.bpv_id = pvi.pv_variant_id
       LEFT JOIN units u ON pv.bpv_unit = u.unit_id
+      LEFT JOIN bh_product_info pi ON p.product_id = pi.product_id
       WHERE p.product_id = ?
-      GROUP BY p.product_id, pv.bpv_id
+      GROUP BY p.product_id, pv.bpv_id, pi.id
       ORDER BY pv.bpv_id DESC
     `;
-    return await query(sql, [product_id]);
+    const rows = await query(sql, [product_id]);
+    return rows;
   } catch (err) {
     err.message = `GetProductByIdWithDetails failed: ${err.message}`;
+    throw err;
+  }
+};
+// product variants by  id
+module.exports.GetVariantDetailsById = async (variant_id) => {
+  try {
+    const sql = `
+      SELECT 
+        pv.bpv_id,
+        pv.bpv_product_id,
+        pv.bpv_sku,
+        pv.bpv_size,
+        pv.bpv_unit,
+        u.unit_name,
+        pv.bpv_stock,
+        pv.bpv_price,
+        pv.bpv_discount,
+        pv.bpv_selling_price,
+        pv.bpv_gst_price,
+        pv.bpv_vat_price,
+        p.category_id,
+        p.sub_category_id,
+        p.shipping,
+        p.cash_on_delivery,
+        p.refundable,
+        p.free_delivery,
+        p.new_arrival,
+        ts.tx_schedule_id,
+        ts.tx_schedule_name,
+        ts.tx_schedule_tax,
+        ts.tx_schedule_cgst,
+        ts.tx_schedule_igst,
+        ts.tx_schedule_sgst,
+        ts.tx_schedule_vat,
+        GROUP_CONCAT(DISTINCT pvi.pv_file) AS variant_images   
+      FROM bh_product_variants pv
+      LEFT JOIN units u ON pv.bpv_unit = u.unit_id
+      LEFT JOIN bh_products p ON pv.bpv_product_id = p.product_id
+      LEFT JOIN bh_product_tax pt ON p.product_id = pt.product_id
+      LEFT JOIN tax_schedule ts ON pt.tax_value_id = ts.tx_schedule_id
+      LEFT JOIN bh_product_variant_images pvi ON pv.bpv_id = pvi.pv_variant_id
+      LEFT JOIN bh_product_images pi ON p.product_id = pi.product_id
+      WHERE pv.bpv_id = ?
+      GROUP BY pv.bpv_id
+      LIMIT 1
+    `;
+    const rows = await query(sql, [variant_id]);
+    return rows.length > 0 ? rows[0] : null;
+  } catch (err) {
+    err.message = `GetVariantDetailsById failed: ${err.message}`;
     throw err;
   }
 };
