@@ -52,32 +52,21 @@ module.exports.SubCategoryList = async (req, res) => {
     try {
         const lang = req.body.language || 'en';
         let { category_id, page = 1, limit = 20, search = '', statusKey } = req.body;
-        // Make role optional; default to 'guest' (no privileged data assumed)
         const role = (req.user && req.user.role) ? req.user.role : 'guest';
-
         page = parseInt(page, 10) || 1;
         limit = parseInt(limit, 10) || 20;
         const offset = (page - 1) * limit;
-
-        // Map role -> status filter without injecting raw SQL
-        // Only customers/guests see active items by default
-        // Admins/managers can see all
-        if (role === 'user' || role === 'guest') {
-            statusKey = 'active';
-        }
+        // For admin or other roles statusKey is accepted as passed
 
         const language = await languages(lang);
 
-        // Total count with same filters (for correct pagination)
         const totalRowsResult = await model.GetSubCategoryCount(lang, statusKey, category_id, search);
         const totalCount = totalRowsResult?.[0]?.total || 0;
 
-        // Paged data
         const getSubCategory = await model.GetSubCategory(lang, statusKey, category_id, search, offset, limit);
 
         const totalPage = Math.ceil(totalCount / limit);
 
-        // Attach product count for each subcategory
         const data = await Promise.all(
             getSubCategory.map(async (el) => {
                 const count = await model.GetProductSubCategoryCount(el.sc_id);
