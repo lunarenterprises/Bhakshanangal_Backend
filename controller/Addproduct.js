@@ -480,22 +480,22 @@ module.exports.GetProductByIdWithDetails = async (req, res) => {
   try {
     const { product_id } = req.body;
     if (!product_id) {
-      return res.status(400).send({
-        result: false,
-        message: "Product ID is required",
-      });
+      return res.status(400).send({ result: false, message: "Product ID is required" });
     }
 
     const rows = await model.GetProductByIdWithDetails(Number(product_id));
 
     if (!rows || rows.length === 0) {
-      return res.status(404).send({
-        result: false,
-        message: "Product not found",
-      });
+      return res.status(404).send({ result: false, message: "Product not found" });
     }
 
-    // product-level fields from first row
+    // Fetch tax ids and schedules separately
+    const taxIds = await model.GetProductTaxIds(product_id);
+    const taxSchedules = await model.GetTaxSchedulesByIds(taxIds);
+
+    // Build response objects (taxSchedules will be an array)
+    // Build product info and variants as before
+
     const productInfo = {
       product_id: rows[0].product_id,
       product_name: rows[0].product_name,
@@ -507,30 +507,15 @@ module.exports.GetProductByIdWithDetails = async (req, res) => {
       refundable: rows[0].refundable,
       free_delivery: rows[0].free_delivery,
       new_arrival: rows[0].new_arrival,
-      tax_schedules: [],
+      tax_schedules: taxSchedules,
       variants: [],
       info: []
     };
 
-    const taxSchedulesMap = new Map();
     const variantsMap = new Map();
     const infoMap = new Map();
 
-    for (let row of rows) {
-      // tax schedules unique by tx_schedule_id
-      if (row.tx_schedule_id && !taxSchedulesMap.has(row.tx_schedule_id)) {
-        taxSchedulesMap.set(row.tx_schedule_id, {
-          tx_schedule_id: row.tx_schedule_id,
-          tx_schedule_name: row.tx_schedule_name,
-          tx_schedule_tax: row.tx_schedule_tax,
-          tx_schedule_cgst: row.tx_schedule_cgst,
-          tx_schedule_igst: row.tx_schedule_igst,
-          tx_schedule_sgst: row.tx_schedule_sgst,
-          tx_schedule_vat: row.tx_schedule_vat,
-        });
-      }
-
-      // variants unique by bpv_id
+    for (const row of rows) {
       if (row.bpv_id && !variantsMap.has(row.bpv_id)) {
         variantsMap.set(row.bpv_id, {
           bpv_id: row.bpv_id,
@@ -547,8 +532,6 @@ module.exports.GetProductByIdWithDetails = async (req, res) => {
           images: row.variant_images ? row.variant_images.split(",") : [],
         });
       }
-
-      // product info unique by info_label to avoid duplicates
       if (row.info_label && !infoMap.has(row.info_label)) {
         infoMap.set(row.info_label, {
           info_label: row.info_label,
@@ -557,19 +540,12 @@ module.exports.GetProductByIdWithDetails = async (req, res) => {
       }
     }
 
-    productInfo.tax_schedules = Array.from(taxSchedulesMap.values());
     productInfo.variants = Array.from(variantsMap.values());
     productInfo.info = Array.from(infoMap.values());
 
-    return res.send({
-      result: true,
-      data: productInfo,
-    });
+    return res.send({ result: true, data: productInfo });
   } catch (error) {
-    return res.status(500).send({
-      result: false,
-      message: error.message || "Server error",
-    });
+    return res.status(500).send({ result: false, message: error.message || "Server error" });
   }
 };
 module.exports.GetVariantsByProductId = async (req, res) => {

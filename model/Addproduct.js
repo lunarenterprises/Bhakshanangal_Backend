@@ -383,13 +383,6 @@ module.exports.GetProductByIdWithDetails = async (product_id) => {
         p.refundable,
         p.free_delivery,
         p.new_arrival,
-        ts.tx_schedule_id,
-        ts.tx_schedule_name,
-        ts.tx_schedule_tax,
-        ts.tx_schedule_cgst,
-        ts.tx_schedule_igst,
-        ts.tx_schedule_sgst,
-        ts.tx_schedule_vat,
         pv.bpv_id,
         pv.bpv_sku,
         pv.bpv_size,
@@ -407,7 +400,6 @@ module.exports.GetProductByIdWithDetails = async (product_id) => {
       FROM bh_products p
       LEFT JOIN bh_product_translations t ON p.product_id = t.product_id
       LEFT JOIN bh_product_tax pt ON p.product_id = pt.product_id
-      LEFT JOIN tax_schedule ts ON pt.tax_value_id = ts.tx_schedule_id
       LEFT JOIN bh_product_variants pv ON p.product_id = pv.bpv_product_id
       LEFT JOIN bh_product_variant_images pvi ON pv.bpv_id = pvi.pv_variant_id
       LEFT JOIN units u ON pv.bpv_unit = u.unit_id
@@ -420,6 +412,41 @@ module.exports.GetProductByIdWithDetails = async (product_id) => {
     return rows;
   } catch (err) {
     err.message = `GetProductByIdWithDetails failed: ${err.message}`;
+    throw err;
+  }
+};
+// Get tax schedule ids linked to product
+module.exports.GetProductTaxIds = async (product_id) => {
+  try {
+    const sql = `SELECT tax_value_id FROM bh_product_tax WHERE product_id = ?`;
+    const rows = await query(sql, [product_id]);
+    return rows.map(r => r.tax_value_id);
+  } catch (err) {
+    err.message = `GetProductTaxIds failed: ${err.message}`;
+    throw err;
+  }
+};
+
+// Get full tax schedules by array of tax_value_ids
+module.exports.GetTaxSchedulesByIds = async (taxIds) => {
+  try {
+    if (!taxIds || taxIds.length === 0) return [];
+    const placeholders = taxIds.map(() => '?').join(',');
+    const sql = `
+      SELECT 
+        tx_schedule_id,
+        tx_schedule_name,
+        tx_schedule_tax,
+        tx_schedule_cgst,
+        tx_schedule_igst,
+        tx_schedule_sgst,
+        tx_schedule_vat
+      FROM tax_schedule
+      WHERE tx_schedule_id IN (${placeholders})
+    `;
+    return await query(sql, taxIds);
+  } catch (err) {
+    err.message = `GetTaxSchedulesByIds failed: ${err.message}`;
     throw err;
   }
 };
