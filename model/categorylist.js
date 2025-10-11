@@ -118,8 +118,7 @@ module.exports.GetSubCategory = async (
       'inactive': 'sc.sc_status = 0',
       'all': null
     };
-    const statusClause = statusCondition && allowedStatusMap[statusCondition] ? allowedStatusMap[statusCondition] : null;
-
+    const statusClause = statusCondition && allowedStatusMap.hasOwnProperty(statusCondition) ? allowedStatusMap[statusCondition] : null;
     let Query = `
       SELECT 
           ROW_NUMBER() OVER (ORDER BY sc.sc_id DESC) + ? AS sn,
@@ -134,15 +133,15 @@ module.exports.GetSubCategory = async (
           ON sct.sct_c_id = sc.sc_id
       INNER JOIN bh_category_translation c 
           ON sc.sc_category_id = c.ct_c_id 
-         AND c.ct_language_id = sct.sct_language_id
+           AND c.ct_language_id = sct.sct_language_id
       INNER JOIN bh_languages l 
           ON sct.sct_language_id = l.language_id
-      WHERE 
-        AND l.language_code = ?
+      WHERE l.language_code = ?
     `;
 
     const params = [Number(offset), lang];
 
+    // Append status filter if valid
     if (statusClause) {
       Query += ` AND ${statusClause}`;
     }
@@ -161,7 +160,7 @@ module.exports.GetSubCategory = async (
 
     if (limit && Number(limit) > 0) {
       Query += ` LIMIT ? OFFSET ?`;
-      params.push(Number(limit), Number(offset || 0)); // .query expects numbers
+      params.push(Number(limit), Number(offset));
     }
 
     const data = await query(Query, params);
