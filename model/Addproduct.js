@@ -200,7 +200,6 @@ module.exports.CheckProductWithId = async (product_id) => {
     throw error;
   }
 }
-
 // Add a new product variant with all fields
 module.exports.AddProductVariant = async (
   product_id,
@@ -236,7 +235,6 @@ module.exports.AddProductVariant = async (
     throw error;
   }
 };
-
 module.exports.UpdateProductVariant = async (updateString, variant_id) => {
   try {
     let Query = `update bh_product_variants SET ${updateString} WHERE bpv_id=?`
@@ -245,7 +243,6 @@ module.exports.UpdateProductVariant = async (updateString, variant_id) => {
     throw error;
   }
 }
-
 module.exports.AddVariantImages = async (variant_id, filepath) => {
   try {
     let Query = `insert into bh_product_variant_images (pv_variant_id,pv_file) values(?,?)`
@@ -254,7 +251,6 @@ module.exports.AddVariantImages = async (variant_id, filepath) => {
     throw error;
   }
 }
-
 module.exports.GetProductTranslation = async (product_id) => {
   try {
     let Query = `
@@ -269,7 +265,6 @@ module.exports.GetProductTranslation = async (product_id) => {
     throw error;
   }
 }
-
 module.exports.UpdateProduct = async (updateString, product_id) => {
   try {
     let Query = `update bh_products SET ${updateString} WHERE product_id=?`
@@ -278,7 +273,6 @@ module.exports.UpdateProduct = async (updateString, product_id) => {
     throw error;
   }
 }
-
 module.exports.DeleteAllTranslations = async (product_id) => {
   try {
     let Query = `delete from bh_product_translations where product_id=?`
@@ -287,6 +281,27 @@ module.exports.DeleteAllTranslations = async (product_id) => {
     throw error;
   }
 }
+// Delete all product info entries
+module.exports.DeleteProductInfo = async (product_id) => {
+  try {
+    const sql = `DELETE FROM bh_product_info WHERE product_id = ?`;
+    return await query(sql, [product_id]);
+  } catch (error) {
+    error.message = `DeleteProductInfo failed: ${error.message}`;
+    throw error;
+  }
+};
+
+// Delete all tax schedule mappings for product
+module.exports.DeleteProductTax = async (product_id) => {
+  try {
+    const sql = `DELETE FROM bh_product_tax WHERE product_id = ?`;
+    return await query(sql, [product_id]);
+  } catch (error) {
+    error.message = `DeleteProductTax failed: ${error.message}`;
+    throw error;
+  }
+};
 
 module.exports.CheckProductVariant = async (variant_id) => {
   try {
@@ -296,7 +311,6 @@ module.exports.CheckProductVariant = async (variant_id) => {
     throw error;
   }
 }
-
 module.exports.GetProductVariantImages = async (variant_id) => {
   try {
     let Query = `select * from bh_product_variant_images where pv_variant_id=?`
@@ -305,7 +319,6 @@ module.exports.GetProductVariantImages = async (variant_id) => {
     throw error;
   }
 }
-
 module.exports.DeleteFilesQuery = async (user_id, fileKeys) => {
   try {
     var Query = `delete from bh_product_variant_images where pv_variant_id =? and pv_id not in (${fileKeys})`;
@@ -315,7 +328,6 @@ module.exports.DeleteFilesQuery = async (user_id, fileKeys) => {
     throw error;
   }
 }
-
 module.exports.DeleteAllUserFilesQuery = async (variant_id) => {
   try {
     var Query = `delete from bh_product_variant_images where pv_variant_id=? `;
@@ -357,7 +369,6 @@ ORDER BY pv.bpv_id DESC;
     throw err;
   }
 };
-
 module.exports.GetProductByIdWithDetails = async (product_id) => {
   try {
     const sql = `

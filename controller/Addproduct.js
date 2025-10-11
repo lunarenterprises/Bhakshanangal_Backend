@@ -284,129 +284,133 @@ module.exports.AddProductVariants = async (req, res) => {
 };
 module.exports.EditProduct = async (req, res) => {
   try {
-    const { product_id, product_name, product_description, category, shipping, cod, refund, free_delivery, new_arrival, lang = 'en' } = req.body
+    const {
+      product_id,
+      product_name,
+      product_description,
+      category,
+      shipping,
+      cod,
+      refund,
+      free_delivery,
+      new_arrival,
+      tax_value_ids,     // array of tax schedule ids
+      infoArray,         // array of { infoLabel, infoValue }
+      lang = 'en',
+    } = req.body;
+
     const language = await languages(lang);
+
     if (!product_id || !product_name || !product_description) {
       return res.send({
         result: false,
         message: language.insufficient_parameters,
       });
     }
-    const checkProductExist = await model.CheckProductWithId(product_id)
+
+    const checkProductExist = await model.CheckProductWithId(product_id);
     if (checkProductExist.length === 0) {
       return res.send({
         result: false,
         message: "Product not found."
-      })
+      });
     }
-    let CheckProduct = await model.CheckProductQuery(product_name);
-    if (CheckProduct.length > 0) {
+
+    const CheckProduct = await model.CheckProductQuery(product_name);
+    // Allow updating current product name to same name (ignore if same ID)
+    if (CheckProduct.length > 0 && CheckProduct[0].product_id !== Number(product_id)) {
       return res.send({
         result: false,
         message: language.product_already_exists,
       });
     }
-    const checkCategory = await model.CheckCategory(category)
-    if (category && checkCategory.length === 0) {
-      return res.send({
-        result: false,
-        message: "Category not found"
-      })
-    }
-    let product_nameInArab = await translatte(product_name, { to: "ar" });
-    product_nameInArab = product_nameInArab.text;
-    let product_nameInFrench = await translatte(product_name, { to: "fr" });
-    product_nameInFrench = product_nameInFrench.text;
-    let product_nameInHindi = await translatte(product_name, { to: "hi" });
-    product_nameInHindi = product_nameInHindi.text;
-    let product_nameInmalayalam = await translatte(product_name, {
-      to: "ml",
-    });
-    product_nameInmalayalam = product_nameInmalayalam.text;
 
-    let product_descriptionInArab = await translatte(product_description, {
-      to: "ar",
-    });
-    product_descriptionInArab = product_descriptionInArab.text;
-    let product_descriptionInFrench = await translatte(
-      product_description,
-      { to: "fr" }
-    );
-    product_descriptionInFrench = product_descriptionInFrench.text;
-    let product_descriptionInHindi = await translatte(product_description, {
-      to: "hi",
-    });
-    product_descriptionInHindi = product_descriptionInHindi.text;
-    let product_descriptionInmalayalam = await translatte(
-      product_description,
-      { to: "ml" }
-    );
-    product_descriptionInmalayalam = product_descriptionInmalayalam.text;
-    let array = [
-      {
-        lannum: 0,
-        lancod: "en",
-        langP: product_name,
-        langD: product_description,
-      },
-      {
-        lannum: 1,
-        lancod: "ar",
-        langP: product_nameInArab,
-        langD: product_descriptionInArab,
-      },
-      {
-        lannum: 2,
-        lancod: "fr",
-        langP: product_nameInFrench,
-        langD: product_descriptionInFrench,
-      },
-      {
-        lannum: 3,
-        lancod: "hi",
-        langP: product_nameInHindi,
-        langD: product_descriptionInHindi,
-      },
-      {
-        lannum: 4,
-        lancod: "ml",
-        langP: product_nameInmalayalam,
-        langD: product_descriptionInmalayalam,
-      },
+    if (category) {
+      const checkCategory = await model.CheckCategory(category);
+      if (checkCategory.length === 0) {
+        return res.send({
+          result: false,
+          message: "Category not found"
+        });
+      }
+    }
+
+    // Translate product name/description into all languages
+    const product_nameInArab = (await translatte(product_name, { to: "ar" })).text;
+    const product_nameInFrench = (await translatte(product_name, { to: "fr" })).text;
+    const product_nameInHindi = (await translatte(product_name, { to: "hi" })).text;
+    const product_nameInMalayalam = (await translatte(product_name, { to: "ml" })).text;
+
+    const product_descriptionInArab = (await translatte(product_description, { to: "ar" })).text;
+    const product_descriptionInFrench = (await translatte(product_description, { to: "fr" })).text;
+    const product_descriptionInHindi = (await translatte(product_description, { to: "hi" })).text;
+    const product_descriptionInMalayalam = (await translatte(product_description, { to: "ml" })).text;
+
+    const translationsArray = [
+      { lannum: 0, lancod: "en", langP: product_name, langD: product_description },
+      { lannum: 1, lancod: "ar", langP: product_nameInArab, langD: product_descriptionInArab },
+      { lannum: 2, lancod: "fr", langP: product_nameInFrench, langD: product_descriptionInFrench },
+      { lannum: 3, lancod: "hi", langP: product_nameInHindi, langD: product_descriptionInHindi },
+      { lannum: 4, lancod: "ml", langP: product_nameInMalayalam, langD: product_descriptionInMalayalam },
     ];
-    await model.DeleteAllTranslations(product_id)
-    array.forEach(async (el) => {
-      await model.AddTranslatedProducts(
-        product_id,
-        el.lannum,
-        el.langP,
-        el.langD
-      );
-    });
-    let updates = [];
+
+    // Delete old translations, product info and taxes
+    await model.DeleteAllTranslations(product_id);
+    await model.DeleteProductInfo(product_id);
+    await model.DeleteProductTax(product_id);
+
+    // Insert new translations
+    for (const el of translationsArray) {
+      await model.AddTranslatedProducts(product_id, el.lannum, el.langP, el.langD);
+    }
+
+    // Insert product info array if provided
+    if (Array.isArray(infoArray)) {
+      for (const infoObj of infoArray) {
+        if (infoObj && infoObj.infoLabel && infoObj.infoValue) {
+          await model.InsertProductInfo(product_id, infoObj.infoLabel, infoObj.infoValue);
+        }
+      }
+    }
+
+    // Insert tax schedule mappings
+    if (Array.isArray(tax_value_ids)) {
+      for (const taxId of tax_value_ids) {
+        await model.InsertProductTax(product_id, taxId);
+      }
+    }
+
+    // Update product flags/fields
+    const updates = [];
     if (shipping !== undefined) updates.push(`shipping='${shipping}'`);
     if (cod !== undefined) updates.push(`cash_on_delivery='${cod}'`);
     if (refund !== undefined) updates.push(`refundable='${refund}'`);
-    if (new_arrival !== undefined) updates.push(`new_arrival='${new_arrival}'`);
     if (free_delivery !== undefined) updates.push(`free_delivery='${free_delivery}'`);
+    if (new_arrival !== undefined) updates.push(`new_arrival='${new_arrival}'`);
+    if (category !== undefined) updates.push(`category_id='${category}'`);
+
     if (updates.length > 0) {
       const updateString = updates.join(', ');
-      let updated = await model.UpdateProduct(updateString, product_id);
+      const updated = await model.UpdateProduct(updateString, product_id);
       if (updated.affectedRows === 0) {
         return res.send({
           result: false,
-          message: "Failed to update product"
-        })
+          message: "Failed to update product",
+        });
       }
     }
+
     return res.send({
       result: true,
-      message: "Product updated successfully"
-    })
+      message: "Product updated successfully",
+    });
   } catch (error) {
-    return res.send({})
+    return res.send({
+      result: false,
+      message: error.message || "Server error",
+    });
   }
-}
+};
 module.exports.EditProductVariant = async (req, res) => {
   try {
     const formidable = require('formidable');
