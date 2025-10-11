@@ -283,6 +283,7 @@ module.exports.AddProductVariants = async (req, res) => {
   }
 };
 module.exports.EditProduct = async (req, res) => {
+  console.log("EditProduct", req.body);
   try {
     const {
       product_id,
