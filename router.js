@@ -37,7 +37,7 @@ route.post("/remove-address", verifyToken, RemoveAddress);
 var { AddProducts, AddProductVariants, EditProduct, EditProductVariant, GetVariantsByProductId, GetProductByIdWithDetails, GetVariantDetailsById } = require("./controller/Addproduct");
 route.post("/addproduct", verifyToken, authorize('admin'), AddProducts);
 route.post("/product/addvariant", verifyToken, authorize('admin'), AddProductVariants);
-route.post("product/edit", verifyToken, EditProduct);
+route.post("/product/edit", verifyToken, EditProduct);
 route.post("/variant/edit", verifyToken, EditProductVariant);
 route.post("/product/id", GetProductByIdWithDetails);
 route.post("/product/variant/id", GetVariantsByProductId);
